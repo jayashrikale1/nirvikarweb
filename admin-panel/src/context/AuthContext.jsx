@@ -38,6 +38,24 @@ export const AuthProvider = ({ children }) => {
       }
   };
 
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      const response = await api.post('/auth/change-password', { currentPassword, newPassword });
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message || 'Change password failed' };
+    }
+  };
+
+  const forgotPassword = async (email) => {
+    try {
+      const response = await api.post('/auth/forgot-password', { email });
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message || 'Forgot password request failed' };
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -45,7 +63,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, changePassword, forgotPassword, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ShoppingBag, Layers, LogOut } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Layers, LogOut, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Nav } from 'react-bootstrap';
 
@@ -12,6 +12,7 @@ const Sidebar = ({ className = '', style = {}, onNavigate }) => {
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Categories', path: '/categories', icon: Layers },
     { name: 'Products', path: '/products', icon: ShoppingBag },
+    { name: 'Change Password', path: '/change-password', icon: KeyRound },
   ];
 
   return (
