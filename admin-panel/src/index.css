@@ -78,7 +78,7 @@ body {
 .avatar-circle {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, #0d6efd 0%, #0dclf2 100%);
+  background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -86,4 +86,9 @@ body {
   justify-content: center;
   font-weight: 600;
   font-size: 14px;
+}
+
+/* Custom Utilities */
+.mb-5 { 
+  margin-bottom: 2rem !important; 
 }
