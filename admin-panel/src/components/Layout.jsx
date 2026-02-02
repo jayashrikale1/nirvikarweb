@@ -32,7 +32,7 @@ const Layout = ({ children }) => {
       </Offcanvas>
 
       <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0 }}>
-        <Navbar bg="white" className="shadow-sm px-3 px-md-4 justify-content-between">
+        <Navbar className="navbar-custom px-3 px-md-4 justify-content-between sticky-top">
             <div className="d-flex align-items-center">
                 <Button 
                     variant="link" 
@@ -42,12 +42,22 @@ const Layout = ({ children }) => {
                     <Menu size={24} />
                 </Button>
                 <Navbar.Brand className="fw-bold text-dark d-md-none">Nirvikar</Navbar.Brand>
-                <h4 className="m-0 d-none d-md-block">Admin Panel</h4>
+                <div className="d-none d-md-block">
+                    <h4 className="m-0 fw-bold text-dark" style={{ letterSpacing: '-0.5px' }}>Admin Panel</h4>
+                    <small className="text-muted">Manage your store efficiently</small>
+                </div>
             </div>
             
             <div className="d-flex align-items-center">
-                <span className="text-secondary me-2 d-none d-sm-inline">Welcome,</span>
-                <span className="fw-medium text-dark">{user?.name}</span>
+                <div className="user-profile-badge d-flex align-items-center gap-3">
+                    <div className="d-none d-sm-block text-end">
+                        <div className="fw-bold text-dark" style={{ fontSize: '0.9rem' }}>{user?.name || 'Admin User'}</div>
+                        <div className="text-muted" style={{ fontSize: '0.75rem' }}>Administrator</div>
+                    </div>
+                    <div className="avatar-circle shadow-sm">
+                        {user?.name ? user.name.charAt(0).toUpperCase() : 'A'}
+                    </div>
+                </div>
             </div>
         </Navbar>
         <Container fluid className="p-3 p-md-4 flex-grow-1 overflow-auto">
