@@ -192,7 +192,7 @@ const Categories = () => {
             </div>
         )}
 
-        <Modal show={showModal} onHide={handleCloseModal} centered backdrop="static" className="modal-main-content">
+        <Modal show={showModal} onHide={handleCloseModal} centered backdrop="static">
           <Modal.Header closeButton>
             <Modal.Title>{isEditing ? 'Edit Category' : 'Add Category'}</Modal.Title>
           </Modal.Header>

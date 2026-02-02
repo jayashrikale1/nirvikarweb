@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const inquiryRoutes = require('./routes/inquiryRoutes');
 
 const app = express();
 
@@ -21,7 +22,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/inquiries', inquiryRoutes);
 
 // Swagger Config
 const swaggerOptions = {

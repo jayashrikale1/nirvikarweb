@@ -7,7 +7,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalCategories: 0,
-    totalOrders: 0
+    totalInquiries: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -60,8 +60,8 @@ const Dashboard = () => {
           <Col md={4}>
             <Card className="shadow-sm h-100">
               <Card.Body>
-                <Card.Subtitle className="mb-2 text-muted">Orders</Card.Subtitle>
-                <Card.Title className="display-6 fw-bold">{stats.totalOrders}</Card.Title>
+                <Card.Subtitle className="mb-2 text-muted">Total Inquiries</Card.Subtitle>
+                <Card.Title className="display-6 fw-bold">{stats.totalInquiries}</Card.Title>
               </Card.Body>
             </Card>
           </Col>

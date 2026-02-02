@@ -308,7 +308,7 @@ const Products = () => {
             </div>
         )}
 
-        <Modal show={showModal} onHide={handleCloseModal} size="lg" centered scrollable backdrop="static" className="modal-main-content">
+        <Modal show={showModal} onHide={handleCloseModal} size="lg" centered scrollable backdrop="static">
           <Modal.Header closeButton>
             <Modal.Title>{isEditing ? 'Edit Product' : 'Add Product'}</Modal.Title>
           </Modal.Header>
