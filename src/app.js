@@ -62,4 +62,10 @@ app.get('/', (req, res) => {
   res.send('Nirvikar Backend API is running. Check /api-docs for documentation.');
 });
 
+// Sync models (force: false will not drop tables)
+// In production, use migrations instead of sync
+sequelize.sync({ alter: true }).then(() => {
+  console.log('Database synced.');
+});
+
 module.exports = app;

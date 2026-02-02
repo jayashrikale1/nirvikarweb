@@ -128,6 +128,7 @@ exports.getAllProducts = async (req, res) => {
         currentPage: parseInt(page)
     });
   } catch (error) {
+    console.error('Error in getAllProducts:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
