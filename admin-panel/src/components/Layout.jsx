@@ -12,9 +12,9 @@ const Layout = ({ children }) => {
     const handleShow = () => setShowMobileSidebar(true);
 
   return (
-    <div className="d-flex min-vh-100 bg-light">
+    <div className="layout-root">
       {/* Desktop Sidebar */}
-      <div className="d-none d-md-block" style={{ width: '280px' }}>
+      <div className="sidebar-scroll-container">
           <Sidebar />
       </div>
 
@@ -31,8 +31,8 @@ const Layout = ({ children }) => {
         </Offcanvas.Body>
       </Offcanvas>
 
-      <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0 }}>
-        <Navbar className="navbar-custom px-3 px-md-4 justify-content-between sticky-top">
+      <div className="flex-grow-1 d-flex flex-column h-100 overflow-hidden" style={{ minWidth: 0 }}>
+        <Navbar className="navbar-custom px-3 px-md-4 justify-content-between">
             <div className="d-flex align-items-center">
                 <Button 
                     variant="link" 
@@ -60,9 +60,11 @@ const Layout = ({ children }) => {
                 </div>
             </div>
         </Navbar>
-        <Container fluid className="p-3 p-md-4 flex-grow-1 overflow-auto">
-          {children}
-        </Container>
+        <div className="flex-grow-1 overflow-y-auto">
+            <Container fluid className="p-3 p-md-4">
+              {children}
+            </Container>
+        </div>
       </div>
     </div>
   );

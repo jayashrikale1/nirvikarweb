@@ -3,12 +3,72 @@ body {
   background-color: #f8f9fa;
   min-height: 100vh;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden; /* Prevent body scroll since we handle it in Layout */
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(108, 117, 125, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(108, 117, 125, 0.5);
+}
+
+/* Layout Specific Styles - Explicitly defined for scrolling behavior */
+.layout-root {
+  display: flex;
+  height: 100vh; /* Force full viewport height */
+  width: 100vw;
+  overflow: hidden; /* No scroll on root */
+  background-color: #f8f9fa;
+}
+
+.sidebar-scroll-container {
+  width: 280px;
+  height: 100%;
+  overflow-y: auto; /* Independent scroll */
+  flex-shrink: 0;
+  display: none; /* Default hidden for mobile */
+}
+
+@media (min-width: 768px) {
+  .sidebar-scroll-container {
+    display: block; /* Show on desktop */
+  }
+}
+
+.main-content-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0; /* Crucial for nested flex scrolling */
+  overflow: hidden;
+}
+
+.content-scroll-area {
+  flex-grow: 1;
+  overflow-y: auto; /* Independent scroll */
+  height: 0; /* Hack to force flex child to scroll properly */
+  padding-bottom: 20px;
 }
 
 /* Sidebar Styles */
 .sidebar-wrapper {
   background: linear-gradient(180deg, #1a1d20 0%, #212529 100%);
   box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+  min-height: 100%; /* Ensure background covers full scroll height */
 }
 
 .nav-link-custom {
