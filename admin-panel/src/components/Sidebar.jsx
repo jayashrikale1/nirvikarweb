@@ -1,20 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ShoppingBag, Layers, LogOut, KeyRound } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Layers, LogOut, KeyRound, Settings, User, ChevronDown, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { Nav } from 'react-bootstrap';
+import { Nav, Collapse } from 'react-bootstrap';
 import logo from '../assets/logo.png';
 
 const Sidebar = ({ className = '', style = {}, onNavigate }) => {
   const { logout } = useAuth();
   const location = useLocation();
+  
+  // Check if current path is a setting path to auto-open
+  const isSettingsActive = location.pathname === '/profile' || location.pathname === '/change-password';
+  const [openSettings, setOpenSettings] = useState(isSettingsActive);
 
-  const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Categories', path: '/categories', icon: Layers },
-    { name: 'Products', path: '/products', icon: ShoppingBag },
-    { name: 'Change Password', path: '/change-password', icon: KeyRound },
-  ];
+  const isActive = (path) => location.pathname === path;
+
+  const toggleSettings = () => setOpenSettings(!openSettings);
 
   return (
     <div 
@@ -32,22 +33,76 @@ const Sidebar = ({ className = '', style = {}, onNavigate }) => {
       </Link>
       
       <Nav variant="pills" className="flex-column mb-auto gap-2">
-        {navItems.map((item) => {
-           const Icon = item.icon;
-           const isActive = location.pathname.startsWith(item.path);
-           return (
-            <Nav.Item key={item.path}>
-              <Link
-                to={item.path}
-                className={`nav-link-custom ${isActive ? 'active' : ''} text-decoration-none`}
-                onClick={onNavigate}
-              >
-                <Icon className="me-3" size={20} />
-                <span>{item.name}</span>
-              </Link>
-            </Nav.Item>
-          );
-        })}
+        <Nav.Item>
+          <Link
+            to="/dashboard"
+            className={`nav-link-custom ${isActive('/dashboard') ? 'active' : ''} text-decoration-none`}
+            onClick={onNavigate}
+          >
+            <LayoutDashboard className="me-3" size={20} />
+            <span>Dashboard</span>
+          </Link>
+        </Nav.Item>
+
+        <Nav.Item>
+          <Link
+            to="/categories"
+            className={`nav-link-custom ${isActive('/categories') ? 'active' : ''} text-decoration-none`}
+            onClick={onNavigate}
+          >
+            <Layers className="me-3" size={20} />
+            <span>Categories</span>
+          </Link>
+        </Nav.Item>
+
+        <Nav.Item>
+          <Link
+            to="/products"
+            className={`nav-link-custom ${isActive('/products') ? 'active' : ''} text-decoration-none`}
+            onClick={onNavigate}
+          >
+            <ShoppingBag className="me-3" size={20} />
+            <span>Products</span>
+          </Link>
+        </Nav.Item>
+
+        {/* Settings Dropdown */}
+        <Nav.Item>
+          <div 
+            className={`nav-link-custom ${openSettings ? 'bg-white bg-opacity-10' : ''} text-decoration-none cursor-pointer d-flex justify-content-between align-items-center`}
+            onClick={toggleSettings}
+            style={{ cursor: 'pointer' }}
+          >
+            <div className="d-flex align-items-center">
+                <Settings className="me-3" size={20} />
+                <span>Settings</span>
+            </div>
+            {openSettings ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          </div>
+          
+          <Collapse in={openSettings}>
+            <div className="ps-3 mt-1">
+                <Link
+                    to="/profile"
+                    className={`nav-link-custom py-2 mb-1 ${isActive('/profile') ? 'active' : ''} text-decoration-none`}
+                    style={{ fontSize: '0.95rem' }}
+                    onClick={onNavigate}
+                >
+                    <User className="me-3" size={18} />
+                    <span>Profile Update</span>
+                </Link>
+                <Link
+                    to="/change-password"
+                    className={`nav-link-custom py-2 ${isActive('/change-password') ? 'active' : ''} text-decoration-none`}
+                    style={{ fontSize: '0.95rem' }}
+                    onClick={onNavigate}
+                >
+                    <KeyRound className="me-3" size={18} />
+                    <span>Change Password</span>
+                </Link>
+            </div>
+          </Collapse>
+        </Nav.Item>
       </Nav>
       
       <div className="mt-5 pt-3 border-top border-secondary border-opacity-25">

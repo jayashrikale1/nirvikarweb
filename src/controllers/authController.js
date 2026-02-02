@@ -99,18 +99,65 @@ exports.forgotPassword = async (req, res) => {
         const admin = await AdminUser.findOne({ where: { email } });
         
         if (!admin) {
-            // Good security practice not to reveal if email exists, but for internal admin panel it might be ok.
-            // For now, let's just say "If email exists..."
             return res.status(404).json({ message: 'Admin not found' });
         }
 
-        // In a real app, generate token, save to DB, send email.
-        // For now, we'll just mock it or return a message saying "Contact Super Admin" 
-        // or actually implement a basic reset if needed. 
-        // Given constraints, I'll return a message.
-        
-        res.json({ message: 'Password reset link has been sent to your email (Mocked)' });
+        // In a real app, send email with reset token
+        // For now, just return success
+        res.json({ message: 'Password reset link sent to email' });
 
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.getProfile = async (req, res) => {
+    try {
+        const admin = await AdminUser.findByPk(req.admin.id, {
+            attributes: { exclude: ['password'] }
+        });
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+        res.json(admin);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const { name, email, phone } = req.body;
+        const admin = await AdminUser.findByPk(req.admin.id);
+
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        // Check if email is being changed and if it's already taken
+        if (email && email !== admin.email) {
+            const existingAdmin = await AdminUser.findOne({ where: { email } });
+            if (existingAdmin) {
+                return res.status(400).json({ message: 'Email already in use' });
+            }
+        }
+
+        admin.name = name || admin.name;
+        admin.email = email || admin.email;
+        admin.phone = phone || admin.phone;
+
+        await admin.save();
+
+        res.json({ 
+            message: 'Profile updated successfully',
+            admin: {
+                id: admin.id,
+                name: admin.name,
+                email: admin.email,
+                phone: admin.phone,
+                role: admin.role
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

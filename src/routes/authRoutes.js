@@ -146,4 +146,55 @@ router.post('/change-password', authMiddleware, authController.changePassword);
  */
 router.post('/forgot-password', authController.forgotPassword);
 
+/**
+ * @swagger
+ * /auth/profile:
+ *   get:
+ *     summary: Get admin profile
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Admin profile details
+ *       404:
+ *         description: Admin not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/profile', authMiddleware, authController.getProfile);
+
+/**
+ * @swagger
+ * /auth/profile:
+ *   put:
+ *     summary: Update admin profile
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *       400:
+ *         description: Email already in use
+ *       404:
+ *         description: Admin not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/profile', authMiddleware, authController.updateProfile);
+
 module.exports = router;
