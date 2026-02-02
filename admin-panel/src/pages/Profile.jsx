@@ -61,7 +61,6 @@ const Profile = () => {
   return (
     <Layout>
       <Container fluid className="p-4">
-        <h2 className="mb-4">Profile Settings</h2>
         
         <Row className="justify-content-center">
           <Col md={8} lg={6}>

@@ -2,17 +2,19 @@ import React, { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import api from '../services/api';
 import { toast } from 'react-toastify';
-import { Plus, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Eye } from 'lucide-react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Container, Card, Table, Button, Modal, Form, Row, Col, Image, Pagination } from 'react-bootstrap';
+import { Container, Card, Table, Button, Modal, Form, Row, Col, Image, Pagination, Badge } from 'react-bootstrap';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
+  const [viewProductData, setViewProductData] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -111,6 +113,11 @@ const Products = () => {
       specifications: specs
     });
     setShowModal(true);
+  };
+
+  const handleView = (product) => {
+    setViewProductData(product);
+    setShowViewModal(true);
   };
 
   const onSubmit = async (data) => {
@@ -260,6 +267,14 @@ const Products = () => {
                       <td className="px-4 py-3 text-end align-middle">
                         <Button
                           variant="link"
+                          className="text-info p-0 me-3"
+                          onClick={() => handleView(product)}
+                          title="View Details"
+                        >
+                          <Eye size={16} />
+                        </Button>
+                        <Button
+                          variant="link"
                           className="text-primary p-0 me-3"
                           onClick={() => handleEdit(product)}
                         >
@@ -308,7 +323,7 @@ const Products = () => {
             </div>
         )}
 
-        <Modal show={showModal} onHide={handleCloseModal} size="lg" centered scrollable backdrop="static">
+        <Modal show={showModal} onHide={handleCloseModal} size="lg" centered scrollable backdrop="static" className="modal-with-sidebar">
           <Modal.Header closeButton>
             <Modal.Title>{isEditing ? 'Edit Product' : 'Add Product'}</Modal.Title>
           </Modal.Header>
@@ -450,6 +465,192 @@ const Products = () => {
               {isEditing ? 'Update' : 'Create'}
             </Button>
           </Modal.Footer>
+        </Modal>
+
+        {/* View Product Modal */}
+        <Modal show={showViewModal} onHide={() => setShowViewModal(false)} size="lg" centered scrollable className="modal-with-sidebar">
+            <Modal.Header closeButton>
+                <Modal.Title>Product Details</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {viewProductData && (
+                    <Container fluid className="p-0">
+                        {/* Top Section: Images and Key Info */}
+                        <Row className="mb-4">
+                            {/* Image Gallery Section */}
+                            <Col lg={5} className="mb-3 mb-lg-0">
+                                <div className="border rounded p-2 mb-2 bg-white text-center">
+                                    {viewProductData.main_image ? (
+                                        <Image 
+                                            src={`http://localhost:5000/${viewProductData.main_image}`} 
+                                            alt={viewProductData.product_name} 
+                                            fluid 
+                                            style={{ maxHeight: '300px', objectFit: 'contain' }} 
+                                        />
+                                    ) : (
+                                        <div className="d-flex align-items-center justify-content-center text-muted" style={{ height: '300px' }}>
+                                            No Main Image
+                                        </div>
+                                    )}
+                                </div>
+                                {/* Additional Images Thumbnails */}
+                                {viewProductData.images && viewProductData.images.length > 0 && (
+                                    <div className="d-flex gap-2 overflow-auto py-1">
+                                        {viewProductData.images.map((img, idx) => (
+                                            <Image 
+                                                key={img.id || idx}
+                                                src={`http://localhost:5000/${img.image_path}`}
+                                                thumbnail
+                                                style={{ width: '60px', height: '60px', objectFit: 'cover', cursor: 'pointer' }}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </Col>
+
+                            {/* Product Details Section */}
+                            <Col lg={7}>
+                                <div className="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h4 className="fw-bold mb-1">{viewProductData.product_name}</h4>
+                                        <div className="text-muted small mb-2">ID: {viewProductData.id} | Slug: {viewProductData.slug || '-'}</div>
+                                    </div>
+                                    <Badge bg={viewProductData.status ? "success" : "danger"} className="fs-6">
+                                        {viewProductData.status ? "Active" : "Inactive"}
+                                    </Badge>
+                                </div>
+
+                                <div className="mb-3">
+                                    <Badge bg="info" className="me-2 text-dark">{categories.find(c => c.id === viewProductData.category_id)?.category_name || 'Uncategorized'}</Badge>
+                                    <Badge bg="secondary" className="me-2">{viewProductData.brand || 'No Brand'}</Badge>
+                                    {viewProductData.home_delivery && <Badge bg="primary">Home Delivery</Badge>}
+                                </div>
+
+                                <Card className="bg-light border-0 mb-3">
+                                    <Card.Body className="py-2">
+                                        <Row className="g-2 text-center">
+                                            <Col xs={4}>
+                                                <div className="text-muted small">MRP</div>
+                                                <div className="text-decoration-line-through text-danger fw-bold">₹{viewProductData.mrp_price}</div>
+                                            </Col>
+                                            <Col xs={4}>
+                                                <div className="text-muted small">Selling Price</div>
+                                                <div className="text-success fw-bold fs-5">₹{viewProductData.selling_price}</div>
+                                            </Col>
+                                            <Col xs={4}>
+                                                <div className="text-muted small">Doctor Price</div>
+                                                <div className="text-primary fw-bold">₹{viewProductData.doctor_price}</div>
+                                            </Col>
+                                        </Row>
+                                    </Card.Body>
+                                </Card>
+
+                                <Row className="g-3 mb-3">
+                                    <Col xs={6} md={4}>
+                                        <small className="text-muted d-block">Stock Quantity</small>
+                                        <strong>{viewProductData.stock_quantity || 0}</strong>
+                                    </Col>
+                                    <Col xs={6} md={4}>
+                                        <small className="text-muted d-block">GST Applicable</small>
+                                        <strong>{viewProductData.gst_applicable ? 'Yes' : 'No'}</strong>
+                                    </Col>
+                                    <Col xs={6} md={4}>
+                                        <small className="text-muted d-block">Material</small>
+                                        <span>{viewProductData.material || '-'}</span>
+                                    </Col>
+                                    <Col xs={6} md={4}>
+                                        <small className="text-muted d-block">Country of Origin</small>
+                                        <span>{viewProductData.country_of_origin || '-'}</span>
+                                    </Col>
+                                    <Col xs={6} md={4}>
+                                        <small className="text-muted d-block">Created At</small>
+                                        <span>{(viewProductData.createdAt || viewProductData.created_at) ? new Date(viewProductData.createdAt || viewProductData.created_at).toLocaleDateString() : '-'}</span>
+                                    </Col>
+                                    <Col xs={6} md={4}>
+                                        <small className="text-muted d-block">Last Updated</small>
+                                        <span>{(viewProductData.updatedAt || viewProductData.updated_at) ? new Date(viewProductData.updatedAt || viewProductData.updated_at).toLocaleDateString() : '-'}</span>
+                                    </Col>
+                                </Row>
+                                
+                                {/* Variants Info if applicable */}
+                                {viewProductData.has_variant && (
+                                    <div className="border rounded p-2 mb-3 bg-white">
+                                         <h6 className="fw-bold mb-2 small text-uppercase text-muted">Variant Information</h6>
+                                         <Row>
+                                            <Col xs={6}>
+                                                <small className="text-muted">Variant Name:</small> {viewProductData.variant_name}
+                                            </Col>
+                                            <Col xs={6}>
+                                                <small className="text-muted">Values:</small> {viewProductData.variant_values}
+                                            </Col>
+                                         </Row>
+                                    </div>
+                                )}
+                            </Col>
+                        </Row>
+
+                        <hr />
+
+                        <Row>
+                            <Col md={12} className="mb-4">
+                                <h6 className="fw-bold text-primary border-bottom pb-2 mb-3">Description & Uses</h6>
+                                
+                                <div className="mb-3">
+                                    <strong className="d-block text-dark mb-1">Short Description</strong>
+                                    <p className="text-muted">{viewProductData.short_description || 'No short description.'}</p>
+                                </div>
+
+                                <div className="mb-3">
+                                    <strong className="d-block text-dark mb-1">Full Description</strong>
+                                    <div className="bg-light p-3 rounded text-break border">
+                                        {viewProductData.full_description || 'No full description.'}
+                                    </div>
+                                </div>
+
+                                {viewProductData.uses && (
+                                    <div>
+                                        <strong className="d-block text-dark mb-1">Uses</strong>
+                                        <div className="p-2 bg-light rounded border">{viewProductData.uses}</div>
+                                    </div>
+                                )}
+                            </Col>
+
+                            <Col md={12}>
+                                <h6 className="fw-bold text-primary border-bottom pb-2 mb-3">Specifications</h6>
+                                <Table bordered hover size="sm" className="mb-0">
+                                    <thead className="table-light">
+                                        <tr>
+                                            <th style={{width: '30%'}}>Attribute</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {(() => {
+                                            let specs = {};
+                                            try {
+                                                specs = typeof viewProductData.specifications_json === 'string' 
+                                                    ? JSON.parse(viewProductData.specifications_json) 
+                                                    : viewProductData.specifications_json || {};
+                                            } catch (e) {}
+                                            const entries = Object.entries(specs);
+                                            if (entries.length === 0) return <tr><td colSpan="2" className="text-center text-muted">No specifications available</td></tr>;
+                                            return entries.map(([key, value]) => (
+                                                <tr key={key}>
+                                                    <td className="fw-medium text-secondary">{key}</td>
+                                                    <td>{value}</td>
+                                                </tr>
+                                            ));
+                                        })()}
+                                    </tbody>
+                                </Table>
+                            </Col>
+                        </Row>
+                    </Container>
+                )}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={() => setShowViewModal(false)}>Close</Button>
+            </Modal.Footer>
         </Modal>
       </Container>
     </Layout>

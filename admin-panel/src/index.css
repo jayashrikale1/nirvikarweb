@@ -153,4 +153,9 @@ body {
   margin-bottom: 2rem !important; 
 }
 
-/* Modal Customization if needed */
+/* Modal Customization for Sidebar Offset */
+@media (min-width: 768px) {
+  .modal-with-sidebar {
+    padding-left: 280px !important;
+  }
+}
