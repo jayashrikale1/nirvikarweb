@@ -35,7 +35,8 @@ exports.createCategory = async (req, res) => {
 
 exports.getAllCategories = async (req, res) => {
   try {
-    const { search } = req.query;
+    const { search, page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
     let whereClause = {};
 
     if (search) {
@@ -44,10 +45,19 @@ exports.getAllCategories = async (req, res) => {
       };
     }
 
-    const categories = await Category.findAll({
-      where: whereClause
+    const { count, rows } = await Category.findAndCountAll({
+      where: whereClause,
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['createdAt', 'DESC']]
     });
-    res.json(categories);
+
+    res.json({
+      categories: rows,
+      total: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page)
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

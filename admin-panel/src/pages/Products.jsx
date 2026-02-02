@@ -4,7 +4,7 @@ import api from '../services/api';
 import { toast } from 'react-toastify';
 import { Plus, Edit, Trash2, X } from 'lucide-react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Container, Card, Table, Button, Modal, Form, Row, Col, Image } from 'react-bootstrap';
+import { Container, Card, Table, Button, Modal, Form, Row, Col, Image, Pagination } from 'react-bootstrap';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -14,6 +14,8 @@ const Products = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const { register, handleSubmit, reset, setValue, watch, control } = useForm({
     defaultValues: {
@@ -34,10 +36,12 @@ const Products = () => {
     fetchCategories();
   }, []);
 
-  const fetchProducts = async (query = '') => {
+  const fetchProducts = async (query = '', page = 1) => {
     try {
-      const response = await api.get('/products', { params: { search: query } });
-      setProducts(response.data);
+      const response = await api.get('/products', { params: { search: query, page, limit: 10 } });
+      setProducts(response.data.products);
+      setTotalPages(response.data.totalPages);
+      setCurrentPage(response.data.currentPage);
     } catch (error) {
       toast.error('Failed to fetch products');
     } finally {
@@ -47,13 +51,13 @@ const Products = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchProducts(searchQuery);
+    fetchProducts(searchQuery, 1);
   };
 
   const fetchCategories = async () => {
     try {
       const response = await api.get('/categories');
-      setCategories(response.data);
+      setCategories(response.data.categories);
     } catch (error) {
       console.error('Failed to fetch categories', error);
     }
@@ -64,7 +68,7 @@ const Products = () => {
       try {
         await api.delete(`/products/${id}`);
         toast.success('Product deleted');
-        fetchProducts();
+        fetchProducts(searchQuery, currentPage);
       } catch (error) {
         toast.error('Failed to delete product');
       }
@@ -161,7 +165,7 @@ const Products = () => {
       reset();
       setIsEditing(false);
       setCurrentProduct(null);
-      fetchProducts();
+      fetchProducts(searchQuery, currentPage);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Operation failed');
     }
@@ -282,7 +286,29 @@ const Products = () => {
           </Card>
         )}
 
-        <Modal show={showModal} onHide={handleCloseModal} size="xl">
+        {totalPages > 1 && (
+            <div className="d-flex justify-content-center mt-4">
+                <Pagination>
+                    <Pagination.First onClick={() => fetchProducts(searchQuery, 1)} disabled={currentPage === 1} />
+                    <Pagination.Prev onClick={() => fetchProducts(searchQuery, currentPage - 1)} disabled={currentPage === 1} />
+                    
+                    {[...Array(totalPages)].map((_, idx) => (
+                        <Pagination.Item 
+                            key={idx + 1} 
+                            active={idx + 1 === currentPage}
+                            onClick={() => fetchProducts(searchQuery, idx + 1)}
+                        >
+                            {idx + 1}
+                        </Pagination.Item>
+                    ))}
+
+                    <Pagination.Next onClick={() => fetchProducts(searchQuery, currentPage + 1)} disabled={currentPage === totalPages} />
+                    <Pagination.Last onClick={() => fetchProducts(searchQuery, totalPages)} disabled={currentPage === totalPages} />
+                </Pagination>
+            </div>
+        )}
+
+        <Modal show={showModal} onHide={handleCloseModal} size="lg">
           <Modal.Header closeButton>
             <Modal.Title>{isEditing ? 'Edit Product' : 'Add Product'}</Modal.Title>
           </Modal.Header>
@@ -292,12 +318,12 @@ const Products = () => {
                 <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Category</Form.Label>
-                    <Form.Select
-                      {...register('category_id', { required: true })}
-                    >
+                    <Form.Select {...register('category_id', { required: true })}>
                       <option value="">Select Category</option>
                       {categories.map((c) => (
-                        <option key={c.id} value={c.id}>{c.category_name}</option>
+                        <option key={c.id} value={c.id}>
+                          {c.category_name}
+                        </option>
                       ))}
                     </Form.Select>
                   </Form.Group>
@@ -305,154 +331,122 @@ const Products = () => {
                 <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Product Name</Form.Label>
-                    <Form.Control
-                      type="text"
-                      {...register('product_name', { required: true })}
-                    />
+                    <Form.Control {...register('product_name', { required: true })} />
                   </Form.Group>
                 </Col>
               </Row>
 
               <Row>
-                <Col md={4}>
+                <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Brand</Form.Label>
-                    <Form.Control type="text" {...register('brand')} />
+                    <Form.Control {...register('brand')} />
                   </Form.Group>
                 </Col>
-                <Col md={4}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Country of Origin</Form.Label>
-                    <Form.Control type="text" {...register('country_of_origin')} />
-                  </Form.Group>
-                </Col>
-                <Col md={4}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Material</Form.Label>
-                    <Form.Control type="text" {...register('material')} />
-                  </Form.Group>
+                <Col md={6}>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Material</Form.Label>
+                        <Form.Control {...register('material')} />
+                    </Form.Group>
                 </Col>
               </Row>
 
               <Row>
-                <Col md={4}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>MRP Price</Form.Label>
-                    <Form.Control type="number" step="0.01" {...register('mrp_price')} />
-                  </Form.Group>
-                </Col>
-                <Col md={4}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Selling Price</Form.Label>
-                    <Form.Control type="number" step="0.01" {...register('selling_price')} />
-                  </Form.Group>
-                </Col>
-                <Col md={4}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Doctor Price</Form.Label>
-                    <Form.Control type="number" step="0.01" {...register('doctor_price')} />
-                  </Form.Group>
-                </Col>
+                  <Col md={6}>
+                      <Form.Group className="mb-3">
+                          <Form.Label>Country of Origin</Form.Label>
+                          <Form.Control {...register('country_of_origin')} />
+                      </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                      <Form.Group className="mb-3">
+                          <Form.Label>MRP Price</Form.Label>
+                          <Form.Control type="number" step="0.01" {...register('mrp_price')} />
+                      </Form.Group>
+                  </Col>
               </Row>
 
               <Row>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Short Description</Form.Label>
-                    <Form.Control as="textarea" rows={2} {...register('short_description')} />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Uses</Form.Label>
-                    <Form.Control as="textarea" rows={2} {...register('uses')} />
-                  </Form.Group>
-                </Col>
+                  <Col md={6}>
+                      <Form.Group className="mb-3">
+                          <Form.Label>Selling Price</Form.Label>
+                          <Form.Control type="number" step="0.01" {...register('selling_price')} />
+                      </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                      <Form.Group className="mb-3">
+                          <Form.Label>Doctor Price</Form.Label>
+                          <Form.Control type="number" step="0.01" {...register('doctor_price')} />
+                      </Form.Group>
+                  </Col>
               </Row>
 
               <Form.Group className="mb-3">
-                <Form.Label>Full Description</Form.Label>
-                <Form.Control as="textarea" rows={4} {...register('full_description')} />
+                <Form.Label>Short Description</Form.Label>
+                <Form.Control as="textarea" rows={2} {...register('short_description')} />
               </Form.Group>
 
-              <Row className="mb-3">
-                <Col md={3}>
-                  <Form.Check 
-                    type="checkbox" 
-                    label="GST Applicable" 
-                    {...register('gst_applicable')} 
-                  />
-                </Col>
-                <Col md={3}>
-                  <Form.Check 
-                    type="checkbox" 
-                    label="Home Delivery" 
-                    {...register('home_delivery')} 
-                  />
-                </Col>
-                <Col md={3}>
-                   <Form.Check 
-                    type="checkbox" 
-                    label="Active Status" 
-                    {...register('status')} 
-                  />
-                </Col>
-              </Row>
+              <Form.Group className="mb-3">
+                <Form.Label>Full Description</Form.Label>
+                <Form.Control as="textarea" rows={3} {...register('full_description')} />
+              </Form.Group>
 
-              <div className="mb-3">
+              <Form.Group className="mb-3">
+                  <Form.Label>Uses</Form.Label>
+                  <Form.Control as="textarea" rows={2} {...register('uses')} />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
                 <Form.Label>Specifications</Form.Label>
                 {fields.map((field, index) => (
                   <div key={field.id} className="d-flex gap-2 mb-2">
-                    <Form.Control
-                      {...register(`specifications.${index}.key`)}
-                      placeholder="Key (e.g. Material)"
-                    />
-                    <Form.Control
-                      {...register(`specifications.${index}.value`)}
-                      placeholder="Value (e.g. Cotton)"
-                    />
+                    <Form.Control placeholder="Key" {...register(`specifications.${index}.key`)} />
+                    <Form.Control placeholder="Value" {...register(`specifications.${index}.value`)} />
                     <Button variant="outline-danger" onClick={() => remove(index)}>
                       <Trash2 size={16} />
                     </Button>
                   </div>
                 ))}
-                <Button
-                  variant="link"
-                  className="p-0 text-decoration-none d-flex align-items-center mt-2"
-                  onClick={() => append({ key: '', value: '' })}
-                >
-                  <Plus size={16} className="me-1" /> Add Specification
+                <Button variant="outline-secondary" size="sm" onClick={() => append({ key: '', value: '' })}>
+                  <Plus size={14} className="me-1" /> Add Specification
                 </Button>
-              </div>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Main Image</Form.Label>
+                <Form.Control type="file" {...register('main_image')} />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Additional Images</Form.Label>
+                <Form.Control type="file" multiple {...register('images')} />
+              </Form.Group>
 
               <Row>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Main Image</Form.Label>
-                    <Form.Control
-                      type="file"
-                      {...register('main_image')}
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Additional Images</Form.Label>
-                    <Form.Control
-                      type="file"
-                      multiple
-                      {...register('images')}
-                    />
-                  </Form.Group>
-                </Col>
+                  <Col md={4}>
+                      <Form.Group className="mb-3">
+                        <Form.Check type="checkbox" label="GST Applicable" {...register('gst_applicable')} />
+                      </Form.Group>
+                  </Col>
+                  <Col md={4}>
+                      <Form.Group className="mb-3">
+                        <Form.Check type="checkbox" label="Home Delivery" {...register('home_delivery')} />
+                      </Form.Group>
+                  </Col>
+                  <Col md={4}>
+                      <Form.Group className="mb-3">
+                        <Form.Check type="checkbox" label="Active Status" {...register('status')} />
+                      </Form.Group>
+                  </Col>
               </Row>
+
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseModal}>
                 Cancel
               </Button>
               <Button variant="primary" type="submit">
-                {isEditing ? 'Update Product' : 'Create Product'}
+                {isEditing ? 'Update' : 'Create'}
               </Button>
             </Modal.Footer>
           </Form>

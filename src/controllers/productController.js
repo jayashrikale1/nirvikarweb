@@ -96,7 +96,8 @@ exports.createProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const { search } = req.query;
+    const { search, page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
     let whereClause = {};
 
     if (search) {
@@ -109,14 +110,23 @@ exports.getAllProducts = async (req, res) => {
         };
     }
 
-    const products = await Product.findAll({
+    const { count, rows } = await Product.findAndCountAll({
         where: whereClause,
         include: [
             { model: Category, as: 'category' },
             { model: ProductImage, as: 'images' }
-        ]
+        ],
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        order: [['createdAt', 'DESC']]
     });
-    res.json(products);
+    
+    res.json({
+        products: rows,
+        total: count,
+        totalPages: Math.ceil(count / limit),
+        currentPage: parseInt(page)
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

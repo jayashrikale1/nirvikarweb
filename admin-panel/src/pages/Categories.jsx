@@ -3,7 +3,7 @@ import Layout from '../components/Layout';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { Container, Row, Col, Card, Table, Button, Modal, Form } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Button, Modal, Form, Pagination } from 'react-bootstrap';
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -13,15 +13,19 @@ const Categories = () => {
   const [currentCategory, setCurrentCategory] = useState(null);
   const [formData, setFormData] = useState({ category_name: '' });
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
-  const fetchCategories = async (query = '') => {
+  const fetchCategories = async (query = '', page = 1) => {
     try {
-      const response = await api.get('/categories', { params: { search: query } });
-      setCategories(response.data);
+      const response = await api.get('/categories', { params: { search: query, page, limit: 10 } });
+      setCategories(response.data.categories);
+      setTotalPages(response.data.totalPages);
+      setCurrentPage(response.data.currentPage);
     } catch (error) {
       toast.error('Failed to fetch categories');
     } finally {
@@ -31,7 +35,7 @@ const Categories = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchCategories(searchQuery);
+    fetchCategories(searchQuery, 1);
   };
 
   const handleDelete = async (id) => {
@@ -39,7 +43,7 @@ const Categories = () => {
       try {
         await api.delete(`/categories/${id}`);
         toast.success('Category deleted');
-        fetchCategories();
+        fetchCategories(searchQuery, currentPage);
       } catch (error) {
         toast.error('Failed to delete category');
       }
@@ -71,7 +75,7 @@ const Categories = () => {
       setFormData({ category_name: '' });
       setIsEditing(false);
       setCurrentCategory(null);
-      fetchCategories();
+      fetchCategories(searchQuery, currentPage);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Operation failed');
     }
@@ -164,6 +168,28 @@ const Categories = () => {
               </Table>
             </Card.Body>
           </Card>
+        )}
+
+        {totalPages > 1 && (
+            <div className="d-flex justify-content-center mt-4">
+                <Pagination>
+                    <Pagination.First onClick={() => fetchCategories(searchQuery, 1)} disabled={currentPage === 1} />
+                    <Pagination.Prev onClick={() => fetchCategories(searchQuery, currentPage - 1)} disabled={currentPage === 1} />
+                    
+                    {[...Array(totalPages)].map((_, idx) => (
+                        <Pagination.Item 
+                            key={idx + 1} 
+                            active={idx + 1 === currentPage}
+                            onClick={() => fetchCategories(searchQuery, idx + 1)}
+                        >
+                            {idx + 1}
+                        </Pagination.Item>
+                    ))}
+
+                    <Pagination.Next onClick={() => fetchCategories(searchQuery, currentPage + 1)} disabled={currentPage === totalPages} />
+                    <Pagination.Last onClick={() => fetchCategories(searchQuery, totalPages)} disabled={currentPage === totalPages} />
+                </Pagination>
+            </div>
         )}
 
         <Modal show={showModal} onHide={handleCloseModal}>
