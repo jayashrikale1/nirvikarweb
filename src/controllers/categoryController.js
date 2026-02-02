@@ -68,7 +68,7 @@ exports.getCategoryById = async (req, res) => {
 
 exports.updateCategory = async (req, res) => {
   try {
-    const { category_name, slug, parent_id, status } = req.body;
+    const { category_name, slug, status } = req.body;
     const category = await Category.findByPk(req.params.id);
 
     if (!category) {
@@ -86,7 +86,6 @@ exports.updateCategory = async (req, res) => {
     await category.update({
       category_name,
       slug,
-      parent_id,
       status
     });
 

@@ -10,10 +10,6 @@ Product.belongsTo(Category, { foreignKey: 'category_id', as: 'category' });
 Product.hasMany(ProductImage, { foreignKey: 'product_id', as: 'images' });
 ProductImage.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
 
-// Self-referencing for Category hierarchy
-Category.hasMany(Category, { foreignKey: 'parent_id', as: 'subcategories' });
-Category.belongsTo(Category, { foreignKey: 'parent_id', as: 'parent' });
-
 module.exports = {
   Category,
   Product,

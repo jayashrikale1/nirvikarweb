@@ -164,20 +164,6 @@ const Categories = () => {
                   required
                 />
               </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Parent Category (Optional)</Form.Label>
-                <Form.Select
-                  value={formData.parent_id}
-                  onChange={(e) => setFormData({ ...formData, parent_id: e.target.value })}
-                >
-                  <option value="">None</option>
-                  {categories
-                    .filter(c => c.id !== currentCategory?.id) // Prevent self-parenting
-                    .map((c) => (
-                    <option key={c.id} value={c.id}>{c.category_name}</option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseModal}>

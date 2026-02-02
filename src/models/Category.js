@@ -15,10 +15,6 @@ const Category = sequelize.define('Category', {
     type: DataTypes.STRING(200),
     allowNull: true,
   },
-  parent_id: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-  },
   status: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
