@@ -59,6 +59,10 @@ const Product = sequelize.define('Product', {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: true,
   },
+  gst_applicable: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
   has_variant: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,

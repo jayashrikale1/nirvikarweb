@@ -13,11 +13,14 @@ const Products = () => {
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { register, handleSubmit, reset, setValue, watch, control } = useForm({
     defaultValues: {
-      has_variant: false,
-      specifications: [{ key: '', value: '' }] // Helper for JSON
+      specifications: [{ key: '', value: '' }],
+      gst_applicable: false,
+      home_delivery: true,
+      status: true
     }
   });
 
@@ -26,22 +29,25 @@ const Products = () => {
     name: "specifications"
   });
 
-  const hasVariant = watch('has_variant');
-
   useEffect(() => {
     fetchProducts();
     fetchCategories();
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (query = '') => {
     try {
-      const response = await api.get('/products');
+      const response = await api.get('/products', { params: { search: query } });
       setProducts(response.data);
     } catch (error) {
       toast.error('Failed to fetch products');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchProducts(searchQuery);
   };
 
   const fetchCategories = async () => {
@@ -86,9 +92,18 @@ const Products = () => {
     reset({
       category_id: product.category_id,
       product_name: product.product_name,
-      has_variant: product.has_variant,
-      variant_name: product.variant_name,
-      variant_values: product.variant_values,
+      brand: product.brand,
+      short_description: product.short_description,
+      full_description: product.full_description,
+      uses: product.uses,
+      material: product.material,
+      country_of_origin: product.country_of_origin,
+      mrp_price: product.mrp_price,
+      selling_price: product.selling_price,
+      doctor_price: product.doctor_price,
+      gst_applicable: product.gst_applicable,
+      home_delivery: product.home_delivery,
+      status: product.status,
       specifications: specs
     });
     setShowModal(true);
@@ -98,13 +113,19 @@ const Products = () => {
     const formData = new FormData();
     formData.append('category_id', data.category_id);
     formData.append('product_name', data.product_name);
-    formData.append('has_variant', data.has_variant);
+    formData.append('brand', data.brand || '');
+    formData.append('short_description', data.short_description || '');
+    formData.append('full_description', data.full_description || '');
+    formData.append('uses', data.uses || '');
+    formData.append('material', data.material || '');
+    formData.append('country_of_origin', data.country_of_origin || '');
+    formData.append('mrp_price', data.mrp_price || 0);
+    formData.append('selling_price', data.selling_price || 0);
+    formData.append('doctor_price', data.doctor_price || 0);
+    formData.append('gst_applicable', data.gst_applicable);
+    formData.append('home_delivery', data.home_delivery);
+    formData.append('status', data.status);
     
-    if (data.has_variant) {
-      formData.append('variant_name', data.variant_name);
-      formData.append('variant_values', data.variant_values);
-    }
-
     // Convert specs array back to JSON object
     const specsObj = {};
     data.specifications.forEach(spec => {
@@ -148,7 +169,12 @@ const Products = () => {
 
   const handleCloseModal = () => {
     setShowModal(false);
-    reset({ has_variant: false, specifications: [{ key: '', value: '' }] });
+    reset({ 
+      specifications: [{ key: '', value: '' }],
+      gst_applicable: false,
+      home_delivery: true,
+      status: true
+    });
     setIsEditing(false);
     setCurrentProduct(null);
   };
@@ -162,7 +188,12 @@ const Products = () => {
             variant="primary"
             onClick={() => {
                 setIsEditing(false);
-                reset({ has_variant: false, specifications: [{ key: '', value: '' }] });
+                reset({ 
+                  specifications: [{ key: '', value: '' }],
+                  gst_applicable: false,
+                  home_delivery: true,
+                  status: true
+                });
                 setShowModal(true);
             }}
             className="d-flex align-items-center"
@@ -171,6 +202,22 @@ const Products = () => {
             Add Product
           </Button>
         </div>
+
+        <Form onSubmit={handleSearch} className="mb-4">
+            <Row>
+                <Col md={8} lg={6}>
+                    <div className="d-flex gap-2">
+                        <Form.Control
+                            type="text"
+                            placeholder="Search by name, brand..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <Button type="submit" variant="outline-primary">Search</Button>
+                    </div>
+                </Col>
+            </Row>
+        </Form>
 
         {loading ? (
           <div className="text-center py-4">Loading...</div>
@@ -183,7 +230,8 @@ const Products = () => {
                     <th className="px-4 py-3">Image</th>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">Category</th>
-                    <th className="px-4 py-3">Variants</th>
+                    <th className="px-4 py-3">Brand</th>
+                    <th className="px-4 py-3">Price</th>
                     <th className="px-4 py-3 text-end">Actions</th>
                   </tr>
                 </thead>
@@ -199,10 +247,11 @@ const Products = () => {
                       </td>
                       <td className="px-4 py-3 fw-medium align-middle">{product.product_name}</td>
                       <td className="px-4 py-3 text-muted align-middle">
-                          {categories.find(c => c.id === product.category_id)?.name || '-'}
+                          {categories.find(c => c.id === product.category_id)?.category_name || '-'}
                       </td>
+                      <td className="px-4 py-3 text-muted align-middle">{product.brand || '-'}</td>
                       <td className="px-4 py-3 text-muted align-middle">
-                          {product.has_variant ? 'Yes' : 'No'}
+                          {product.selling_price ? `₹${product.selling_price}` : '-'}
                       </td>
                       <td className="px-4 py-3 text-end align-middle">
                         <Button
@@ -224,7 +273,7 @@ const Products = () => {
                   ))}
                    {products.length === 0 && (
                       <tr>
-                          <td colSpan="5" className="text-center py-4 text-muted">No products found.</td>
+                          <td colSpan="6" className="text-center py-4 text-muted">No products found.</td>
                       </tr>
                   )}
                 </tbody>
@@ -233,7 +282,7 @@ const Products = () => {
           </Card>
         )}
 
-        <Modal show={showModal} onHide={handleCloseModal} size="lg">
+        <Modal show={showModal} onHide={handleCloseModal} size="xl">
           <Modal.Header closeButton>
             <Modal.Title>{isEditing ? 'Edit Product' : 'Add Product'}</Modal.Title>
           </Modal.Header>
@@ -248,7 +297,7 @@ const Products = () => {
                     >
                       <option value="">Select Category</option>
                       {categories.map((c) => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
+                        <option key={c.id} value={c.id}>{c.category_name}</option>
                       ))}
                     </Form.Select>
                   </Form.Group>
@@ -264,43 +313,91 @@ const Products = () => {
                 </Col>
               </Row>
 
+              <Row>
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Brand</Form.Label>
+                    <Form.Control type="text" {...register('brand')} />
+                  </Form.Group>
+                </Col>
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Country of Origin</Form.Label>
+                    <Form.Control type="text" {...register('country_of_origin')} />
+                  </Form.Group>
+                </Col>
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Material</Form.Label>
+                    <Form.Control type="text" {...register('material')} />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>MRP Price</Form.Label>
+                    <Form.Control type="number" step="0.01" {...register('mrp_price')} />
+                  </Form.Group>
+                </Col>
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Selling Price</Form.Label>
+                    <Form.Control type="number" step="0.01" {...register('selling_price')} />
+                  </Form.Group>
+                </Col>
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Doctor Price</Form.Label>
+                    <Form.Control type="number" step="0.01" {...register('doctor_price')} />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Short Description</Form.Label>
+                    <Form.Control as="textarea" rows={2} {...register('short_description')} />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Uses</Form.Label>
+                    <Form.Control as="textarea" rows={2} {...register('uses')} />
+                  </Form.Group>
+                </Col>
+              </Row>
+
               <Form.Group className="mb-3">
-                <Form.Check
-                  type="checkbox"
-                  label="Has Variants?"
-                  {...register('has_variant')}
-                  id="has_variant_check"
-                />
+                <Form.Label>Full Description</Form.Label>
+                <Form.Control as="textarea" rows={4} {...register('full_description')} />
               </Form.Group>
 
-              {hasVariant && (
-                <Card className="mb-3 bg-light border-0">
-                  <Card.Body>
-                    <Row>
-                      <Col md={6}>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Variant Name</Form.Label>
-                          <Form.Control
-                            type="text"
-                            {...register('variant_name')}
-                            placeholder="e.g. Size, Color"
-                          />
-                        </Form.Group>
-                      </Col>
-                      <Col md={6}>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Variant Values</Form.Label>
-                          <Form.Control
-                            type="text"
-                            {...register('variant_values')}
-                            placeholder="e.g. S, M, L or Red, Blue"
-                          />
-                        </Form.Group>
-                      </Col>
-                    </Row>
-                  </Card.Body>
-                </Card>
-              )}
+              <Row className="mb-3">
+                <Col md={3}>
+                  <Form.Check 
+                    type="checkbox" 
+                    label="GST Applicable" 
+                    {...register('gst_applicable')} 
+                  />
+                </Col>
+                <Col md={3}>
+                  <Form.Check 
+                    type="checkbox" 
+                    label="Home Delivery" 
+                    {...register('home_delivery')} 
+                  />
+                </Col>
+                <Col md={3}>
+                   <Form.Check 
+                    type="checkbox" 
+                    label="Active Status" 
+                    {...register('status')} 
+                  />
+                </Col>
+              </Row>
 
               <div className="mb-3">
                 <Form.Label>Specifications</Form.Label>

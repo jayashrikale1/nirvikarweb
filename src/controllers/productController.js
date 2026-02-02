@@ -1,4 +1,5 @@
 const { Product, ProductImage, Category } = require('../models');
+const { Op } = require('sequelize');
 const fs = require('fs');
 const path = require('path');
 
@@ -17,6 +18,7 @@ exports.createProduct = async (req, res) => {
         mrp_price, 
         selling_price, 
         doctor_price, 
+        gst_applicable,
         has_variant, 
         variant_name, 
         variant_values, 
@@ -57,6 +59,7 @@ exports.createProduct = async (req, res) => {
         mrp_price,
         selling_price,
         doctor_price,
+        gst_applicable: gst_applicable === 'true' || gst_applicable === true,
         has_variant: has_variant === 'true' || has_variant === true,
         variant_name,
         variant_values,
@@ -93,7 +96,21 @@ exports.createProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
   try {
+    const { search } = req.query;
+    let whereClause = {};
+
+    if (search) {
+        whereClause = {
+            [Op.or]: [
+                { product_name: { [Op.like]: `%${search}%` } },
+                { brand: { [Op.like]: `%${search}%` } },
+                { short_description: { [Op.like]: `%${search}%` } }
+            ]
+        };
+    }
+
     const products = await Product.findAll({
+        where: whereClause,
         include: [
             { model: Category, as: 'category' },
             { model: ProductImage, as: 'images' }
@@ -192,12 +209,9 @@ exports.deleteProduct = async (req, res) => {
         });
     }
 
-    // Product images will be deleted from DB via cascade if set, but Sequelize default doesn't always cascade delete on destroy unless configured.
-    // Let's manually delete them to be safe or rely on DB constraint. 
-    // Sequelize `destroy` handles associations if `cascade: true` or `hooks: true` is set, but we didn't explicitly set it.
-    // It's safer to delete images from DB first.
+    // Manually delete images from DB
     await ProductImage.destroy({ where: { product_id: product.id } });
-
+    
     await product.destroy();
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {

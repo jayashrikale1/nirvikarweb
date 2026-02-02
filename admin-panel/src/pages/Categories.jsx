@@ -12,20 +12,26 @@ const Categories = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentCategory, setCurrentCategory] = useState(null);
   const [formData, setFormData] = useState({ category_name: '' });
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchCategories = async (query = '') => {
     try {
-      const response = await api.get('/categories');
+      const response = await api.get('/categories', { params: { search: query } });
       setCategories(response.data);
     } catch (error) {
       toast.error('Failed to fetch categories');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchCategories(searchQuery);
   };
 
   const handleDelete = async (id) => {
@@ -96,6 +102,22 @@ const Categories = () => {
             Add Category
           </Button>
         </div>
+
+        <Form onSubmit={handleSearch} className="mb-4">
+            <Row>
+                <Col md={8} lg={6}>
+                    <div className="d-flex gap-2">
+                        <Form.Control
+                            type="text"
+                            placeholder="Search by category name..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <Button type="submit" variant="outline-primary">Search</Button>
+                    </div>
+                </Col>
+            </Row>
+        </Form>
 
         {loading ? (
           <div className="text-center py-4">Loading...</div>

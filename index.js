@@ -10,7 +10,7 @@ const startServer = async () => {
     await sequelize.authenticate();
     console.log('Database connected successfully.');
     
-    // Sync models (force: false means it won't drop tables if they exist)
+    // Sync models (force: false will not drop tables)
     // In production, use migrations instead of sync
     await sequelize.sync({ force: false }); 
     console.log('Database synced.');

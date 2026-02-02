@@ -1,4 +1,5 @@
 const { Category } = require('../models');
+const { Op } = require('sequelize');
 
 exports.createCategory = async (req, res) => {
   try {
@@ -34,7 +35,18 @@ exports.createCategory = async (req, res) => {
 
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.findAll();
+    const { search } = req.query;
+    let whereClause = {};
+
+    if (search) {
+      whereClause = {
+        category_name: { [Op.like]: `%${search}%` }
+      };
+    }
+
+    const categories = await Category.findAll({
+      where: whereClause
+    });
     res.json(categories);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
