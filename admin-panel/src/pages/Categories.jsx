@@ -192,12 +192,12 @@ const Categories = () => {
             </div>
         )}
 
-        <Modal show={showModal} onHide={handleCloseModal} centered backdrop="static">
+        <Modal show={showModal} onHide={handleCloseModal} centered backdrop="static" className="modal-main-content">
           <Modal.Header closeButton>
             <Modal.Title>{isEditing ? 'Edit Category' : 'Add Category'}</Modal.Title>
           </Modal.Header>
-          <Form onSubmit={handleSubmit}>
-            <Modal.Body>
+          <Modal.Body>
+            <Form id="category-form" onSubmit={handleSubmit}>
               <Form.Group className="mb-3">
                 <Form.Label>Category Name</Form.Label>
                 <Form.Control
@@ -207,16 +207,16 @@ const Categories = () => {
                   required
                 />
               </Form.Group>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseModal}>
-                Cancel
-              </Button>
-              <Button variant="primary" type="submit">
-                {isEditing ? 'Update' : 'Create'}
-              </Button>
-            </Modal.Footer>
-          </Form>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit" form="category-form">
+              {isEditing ? 'Update' : 'Create'}
+            </Button>
+          </Modal.Footer>
         </Modal>
       </Container>
     </Layout>

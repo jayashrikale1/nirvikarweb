@@ -19,7 +19,7 @@ const Sidebar = ({ className = '', style = {}, onNavigate }) => {
   return (
     <div 
       className={`d-flex flex-column flex-shrink-0 p-4 text-white sidebar-wrapper ${className}`} 
-      style={{ minHeight: '100vh', ...style }}
+      style={{ minHeight: '100%', ...style }}
     >
       <Link to="/" className="d-flex align-items-center justify-content-center mb-5 text-white text-decoration-none w-100">
         <div className="bg-white p-2 rounded-circle shadow-lg d-flex align-items-center justify-content-center" style={{ width: '110px', height: '110px' }}>

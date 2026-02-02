@@ -308,12 +308,12 @@ const Products = () => {
             </div>
         )}
 
-        <Modal show={showModal} onHide={handleCloseModal} size="lg" centered scrollable backdrop="static">
+        <Modal show={showModal} onHide={handleCloseModal} size="lg" centered scrollable backdrop="static" className="modal-main-content">
           <Modal.Header closeButton>
             <Modal.Title>{isEditing ? 'Edit Product' : 'Add Product'}</Modal.Title>
           </Modal.Header>
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            <Modal.Body>
+          <Modal.Body>
+            <Form id="product-form" onSubmit={handleSubmit(onSubmit)}>
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
@@ -440,16 +440,16 @@ const Products = () => {
                   </Col>
               </Row>
 
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseModal}>
-                Cancel
-              </Button>
-              <Button variant="primary" type="submit">
-                {isEditing ? 'Update' : 'Create'}
-              </Button>
-            </Modal.Footer>
-          </Form>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit" form="product-form">
+              {isEditing ? 'Update' : 'Create'}
+            </Button>
+          </Modal.Footer>
         </Modal>
       </Container>
     </Layout>

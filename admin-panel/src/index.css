@@ -92,3 +92,9 @@ body {
 .mb-5 { 
   margin-bottom: 2rem !important; 
 }
+
+@media (min-width: 768px) {
+  .modal-main-content {
+    padding-left: 280px !important;
+  }
+}
