@@ -2,7 +2,7 @@ const { Category } = require('../models');
 
 exports.createCategory = async (req, res) => {
   try {
-    let { category_name, slug, parent_id, status } = req.body;
+    let { category_name, slug, status } = req.body;
     
     if (!category_name) {
         return res.status(400).json({ message: 'Category name is required' });
@@ -16,15 +16,12 @@ exports.createCategory = async (req, res) => {
     // Check if slug exists
     const existingCategory = await Category.findOne({ where: { slug } });
     if (existingCategory) {
-        // Append random string to make unique if auto-generated, or return error?
-        // For now, return error if it's a conflict, or maybe append timestamp
         return res.status(400).json({ message: 'Category with this name/slug already exists' });
     }
 
     const category = await Category.create({
       category_name,
       slug,
-      parent_id,
       status
     });
 
@@ -37,12 +34,7 @@ exports.createCategory = async (req, res) => {
 
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.findAll({
-        include: [
-            { model: Category, as: 'subcategories' },
-            { model: Category, as: 'parent' }
-        ]
-    });
+    const categories = await Category.findAll();
     res.json(categories);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -51,12 +43,7 @@ exports.getAllCategories = async (req, res) => {
 
 exports.getCategoryById = async (req, res) => {
   try {
-    const category = await Category.findByPk(req.params.id, {
-        include: [
-            { model: Category, as: 'subcategories' },
-            { model: Category, as: 'parent' }
-        ]
-    });
+    const category = await Category.findByPk(req.params.id);
     if (!category) {
       return res.status(404).json({ message: 'Category not found' });
     }
@@ -102,9 +89,6 @@ exports.deleteCategory = async (req, res) => {
     if (!category) {
       return res.status(404).json({ message: 'Category not found' });
     }
-
-    // Check for subcategories or products before delete? 
-    // For now, simple delete. DB constraints might fail if restricted.
 
     await category.destroy();
     res.json({ message: 'Category deleted successfully' });

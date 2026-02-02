@@ -11,7 +11,7 @@ const Categories = () => {
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentCategory, setCurrentCategory] = useState(null);
-  const [formData, setFormData] = useState({ category_name: '', parent_id: '' });
+  const [formData, setFormData] = useState({ category_name: '' });
 
   useEffect(() => {
     fetchCategories();
@@ -43,7 +43,7 @@ const Categories = () => {
   const handleEdit = (category) => {
     setIsEditing(true);
     setCurrentCategory(category);
-    setFormData({ category_name: category.category_name, parent_id: category.parent_id || '' });
+    setFormData({ category_name: category.category_name });
     setShowModal(true);
   };
 
@@ -51,8 +51,7 @@ const Categories = () => {
     e.preventDefault();
     try {
       const payload = { 
-          category_name: formData.category_name, 
-          parent_id: formData.parent_id === '' ? null : formData.parent_id 
+          category_name: formData.category_name
       };
 
       if (isEditing) {
@@ -63,7 +62,7 @@ const Categories = () => {
         toast.success('Category created');
       }
       setShowModal(false);
-      setFormData({ category_name: '', parent_id: '' });
+      setFormData({ category_name: '' });
       setIsEditing(false);
       setCurrentCategory(null);
       fetchCategories();
@@ -74,7 +73,7 @@ const Categories = () => {
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setFormData({ category_name: '', parent_id: '' });
+    setFormData({ category_name: '' });
     setIsEditing(false);
     setCurrentCategory(null);
   };
@@ -88,7 +87,7 @@ const Categories = () => {
             variant="primary"
             onClick={() => {
                 setIsEditing(false);
-                setFormData({ category_name: '', parent_id: '' });
+                setFormData({ category_name: '' });
                 setShowModal(true);
             }}
             className="d-flex align-items-center"
@@ -108,7 +107,6 @@ const Categories = () => {
                   <tr>
                     <th className="px-4 py-3">ID</th>
                     <th className="px-4 py-3">Name</th>
-                    <th className="px-4 py-3">Parent Category</th>
                     <th className="px-4 py-3 text-end">Actions</th>
                   </tr>
                 </thead>
@@ -117,9 +115,6 @@ const Categories = () => {
                     <tr key={category.id}>
                       <td className="px-4 py-3 text-muted">{category.id}</td>
                       <td className="px-4 py-3 fw-medium">{category.category_name}</td>
-                      <td className="px-4 py-3 text-muted">
-                          {categories.find(c => c.id === category.parent_id)?.category_name || '-'}
-                      </td>
                       <td className="px-4 py-3 text-end">
                         <Button
                           variant="link"
@@ -140,7 +135,7 @@ const Categories = () => {
                   ))}
                   {categories.length === 0 && (
                       <tr>
-                          <td colSpan="4" className="text-center py-4 text-muted">No categories found.</td>
+                          <td colSpan="3" className="text-center py-4 text-muted">No categories found.</td>
                       </tr>
                   )}
                 </tbody>
