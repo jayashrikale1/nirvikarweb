@@ -131,15 +131,15 @@ const Categories = () => {
               <Table responsive hover className="mb-0">
                 <thead className="bg-light">
                   <tr>
-                    <th className="px-4 py-3">ID</th>
+                    <th className="px-4 py-3">Sr No.</th>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3 text-end">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {categories.map((category) => (
+                  {categories.map((category, index) => (
                     <tr key={category.id}>
-                      <td className="px-4 py-3 text-muted">{category.id}</td>
+                      <td className="px-4 py-3 text-muted">{(currentPage - 1) * 10 + index + 1}</td>
                       <td className="px-4 py-3 fw-medium">{category.category_name}</td>
                       <td className="px-4 py-3 text-end">
                         <Button

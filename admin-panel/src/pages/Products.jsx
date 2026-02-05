@@ -238,7 +238,7 @@ const Products = () => {
               <Table responsive hover className="mb-0">
                 <thead className="bg-light">
                   <tr>
-                    <th className="px-4 py-3">ID</th>
+                    <th className="px-4 py-3">Sr No.</th>
                     <th className="px-4 py-3">Image</th>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">Category</th>
@@ -248,9 +248,9 @@ const Products = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((product) => (
+                  {products.map((product, index) => (
                     <tr key={product.id}>
-                      <td className="px-4 py-3">{product.id}</td>
+                      <td className="px-4 py-3">{(currentPage - 1) * 10 + index + 1}</td>
                       <td className="px-4 py-3">
                           {product.main_image ? (
                               <Image src={`http://localhost:5000/${product.main_image}`} alt={product.product_name} rounded style={{ width: '40px', height: '40px', objectFit: 'cover' }} />

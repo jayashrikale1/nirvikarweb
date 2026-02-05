@@ -129,7 +129,7 @@ const Inquiries = () => {
               <Table responsive hover className="mb-0 align-middle">
                 <thead className="bg-light">
                   <tr>
-                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold" style={{ width: '50px' }}>Id</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold" style={{ width: '50px' }}>Sr No.</th>
                     <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Date</th>
                     <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Customer</th>
                     <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Contact</th>
