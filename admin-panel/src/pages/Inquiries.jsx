@@ -173,23 +173,29 @@ const Inquiries = () => {
                         <td className="px-4 py-3">
                             {getStatusBadge(inquiry.status)}
                         </td>
-                        <td className="px-4 py-3 text-end">
-                            <Button
-                            variant="link"
-                            className="text-primary p-1 me-2 rounded-circle hover-bg-light"
-                            onClick={() => openDetails(inquiry)}
-                            title="View Details"
-                            >
-                            <Eye size={18} />
-                            </Button>
-                            <Button
-                            variant="link"
-                            className="text-danger p-1 rounded-circle hover-bg-light"
-                            onClick={() => handleDelete(inquiry.id)}
-                            title="Delete"
-                            >
-                            <Trash2 size={18} />
-                            </Button>
+                        <td className="px-4 py-3">
+                            <div className="d-flex align-items-center justify-content-end gap-2">
+                                <Button
+                                    variant="light"
+                                    size="sm"
+                                    className="text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                    style={{ width: '32px', height: '32px' }}
+                                    onClick={() => openDetails(inquiry)}
+                                    title="View Details"
+                                >
+                                    <Eye size={16} />
+                                </Button>
+                                <Button
+                                    variant="light"
+                                    size="sm"
+                                    className="text-danger rounded-circle d-flex align-items-center justify-content-center"
+                                    style={{ width: '32px', height: '32px' }}
+                                    onClick={() => handleDelete(inquiry.id)}
+                                    title="Delete"
+                                >
+                                    <Trash2 size={16} />
+                                </Button>
+                            </div>
                         </td>
                         </tr>
                     ))
