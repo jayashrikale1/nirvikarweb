@@ -15,6 +15,55 @@ const cpUpload = upload.fields([
  * tags:
  *   name: Products
  *   description: Product management APIs
+ * components:
+ *   schemas:
+ *     Product:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *         category_id:
+ *           type: integer
+ *         product_name:
+ *           type: string
+ *         slug:
+ *           type: string
+ *         brand:
+ *           type: string
+ *         short_description:
+ *           type: string
+ *         full_description:
+ *           type: string
+ *         uses:
+ *           type: string
+ *         material:
+ *           type: string
+ *         country_of_origin:
+ *           type: string
+ *         mrp_price:
+ *           type: number
+ *         selling_price:
+ *           type: number
+ *         doctor_price:
+ *           type: number
+ *         gst_applicable:
+ *           type: boolean
+ *         has_variant:
+ *           type: boolean
+ *         variant_name:
+ *           type: string
+ *         variant_values:
+ *           type: string
+ *         specifications_json:
+ *           type: object
+ *         stock_quantity:
+ *           type: integer
+ *         home_delivery:
+ *           type: boolean
+ *         main_image:
+ *           type: string
+ *         status:
+ *           type: boolean
  */
 
 /**

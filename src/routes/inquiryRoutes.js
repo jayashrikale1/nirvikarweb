@@ -25,6 +25,9 @@ const protect = require('../middlewares/authMiddleware');
  *         phone:
  *           type: string
  *           description: Phone number
+ *         address:
+ *           type: string
+ *           description: Address of the person
  *         message:
  *           type: string
  *           description: Inquiry message

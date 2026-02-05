@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import api from '../services/api';
 import { toast } from 'react-toastify';
-import { Eye, Trash2 } from 'lucide-react';
-import { Container, Card, Table, Button, Modal, Form, Badge, Pagination, Row, Col } from 'react-bootstrap';
+import { Eye, Trash2, Filter, Inbox, CheckCircle, Clock, MessageSquare } from 'lucide-react';
+import { Container, Card, Table, Button, Modal, Form, Badge, Pagination, Row, Col, Spinner } from 'react-bootstrap';
 
 const Inquiries = () => {
   const [inquiries, setInquiries] = useState([]);
@@ -53,11 +53,7 @@ const Inquiries = () => {
     try {
       await api.put(`/inquiries/${id}/status`, { status: newStatus });
       toast.success('Status updated');
-      
-      // Update local state to reflect change immediately without refetching everything if we want,
-      // or just refetch. Refetching is safer.
       fetchInquiries();
-      
       if (currentInquiry && currentInquiry.id === id) {
           setCurrentInquiry({ ...currentInquiry, status: newStatus });
       }
@@ -69,7 +65,6 @@ const Inquiries = () => {
   const openDetails = (inquiry) => {
     setCurrentInquiry(inquiry);
     setShowModal(true);
-    // Optionally mark as read if it's new
     if (inquiry.status === 'new') {
         handleStatusChange(inquiry.id, 'read');
     }
@@ -82,11 +77,11 @@ const Inquiries = () => {
 
   const getStatusBadge = (status) => {
       switch(status) {
-          case 'new': return <Badge bg="danger">New</Badge>;
-          case 'read': return <Badge bg="info">Read</Badge>;
-          case 'contacted': return <Badge bg="warning" text="dark">Contacted</Badge>;
-          case 'resolved': return <Badge bg="success">Resolved</Badge>;
-          default: return <Badge bg="secondary">{status}</Badge>;
+          case 'new': return <Badge bg="danger" className="px-2 py-1">New</Badge>;
+          case 'read': return <Badge bg="info" className="px-2 py-1">Read</Badge>;
+          case 'contacted': return <Badge bg="warning" text="dark" className="px-2 py-1">Contacted</Badge>;
+          case 'resolved': return <Badge bg="success" className="px-2 py-1">Resolved</Badge>;
+          default: return <Badge bg="secondary" className="px-2 py-1">{status}</Badge>;
       }
   };
 
@@ -94,86 +89,119 @@ const Inquiries = () => {
     <Layout>
       <Container fluid className="p-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="mb-0">Inquiries</h2>
+          <div>
+            <h2 className="mb-1 fw-bold text-dark">Inquiries</h2>
+            <p className="text-muted mb-0">Manage customer messages and product inquiries</p>
+          </div>
         </div>
 
-        <Card className="shadow-sm mb-4">
-            <Card.Body>
-                <Row className="align-items-center">
-                    <Col md={4}>
-                        <Form.Group>
-                            <Form.Label>Filter by Status</Form.Label>
-                            <Form.Select 
-                                value={statusFilter} 
-                                onChange={(e) => {
-                                    setStatusFilter(e.target.value);
-                                    setCurrentPage(1);
-                                }}
-                            >
-                                <option value="">All Statuses</option>
-                                <option value="new">New</option>
-                                <option value="read">Read</option>
-                                <option value="contacted">Contacted</option>
-                                <option value="resolved">Resolved</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-                </Row>
+        <Card className="shadow-sm border-0 mb-4 bg-white rounded-3">
+            <Card.Body className="p-3">
+                <div className="d-flex align-items-center">
+                    <Filter size={18} className="text-muted me-2" />
+                    <Form.Select 
+                        value={statusFilter} 
+                        onChange={(e) => {
+                            setStatusFilter(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                        style={{ maxWidth: '200px' }}
+                        className="border-0 bg-light fw-medium"
+                    >
+                        <option value="">All Inquiries</option>
+                        <option value="new">New</option>
+                        <option value="read">Read</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="resolved">Resolved</option>
+                    </Form.Select>
+                </div>
             </Card.Body>
         </Card>
 
         {loading ? (
-          <div className="text-center py-4">Loading...</div>
+          <div className="text-center py-5">
+            <Spinner animation="border" variant="primary" />
+            <p className="mt-2 text-muted">Loading inquiries...</p>
+          </div>
         ) : (
-          <Card className="shadow-sm">
+          <Card className="shadow-sm border-0 rounded-3 overflow-hidden">
             <Card.Body className="p-0">
-              <Table responsive hover className="mb-0">
+              <Table responsive hover className="mb-0 align-middle">
                 <thead className="bg-light">
                   <tr>
-                    <th className="px-4 py-3">Date</th>
-                    <th className="px-4 py-3">Name</th>
-                    <th className="px-4 py-3">Phone</th>
-                    <th className="px-4 py-3">Product Interest</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3 text-end">Actions</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold" style={{ width: '50px' }}>Id</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Date</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Customer</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Contact</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Address</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Interest</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Status</th>
+                    <th className="px-4 py-3 text-end text-uppercase text-muted small fw-bold">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {inquiries.map((inquiry) => (
-                    <tr key={inquiry.id}>
-                      <td className="px-4 py-3 text-muted" style={{ fontSize: '0.9rem' }}>
-                          {new Date(inquiry.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 py-3 fw-medium">{inquiry.name}</td>
-                      <td className="px-4 py-3">{inquiry.phone}</td>
-                      <td className="px-4 py-3 text-muted">
-                          {inquiry.product ? inquiry.product.product_name : 'General Inquiry'}
-                      </td>
-                      <td className="px-4 py-3">
-                          {getStatusBadge(inquiry.status)}
-                      </td>
-                      <td className="px-4 py-3 text-end">
-                        <Button
-                          variant="link"
-                          className="text-primary p-0 me-3"
-                          onClick={() => openDetails(inquiry)}
-                        >
-                          <Eye size={18} />
-                        </Button>
-                        <Button
-                          variant="link"
-                          className="text-danger p-0"
-                          onClick={() => handleDelete(inquiry.id)}
-                        >
-                          <Trash2 size={18} />
-                        </Button>
-                      </td>
+                  {inquiries.length > 0 ? (
+                    inquiries.map((inquiry, index) => (
+                        <tr key={inquiry.id} className={inquiry.status === 'new' ? 'bg-light-primary' : ''}>
+                        <td className="px-4 py-3 text-muted">{(currentPage - 1) * 10 + index + 1}</td>
+                        <td className="px-4 py-3 text-nowrap">
+                            <div className="d-flex align-items-center">
+                                <Clock size={14} className="me-2 text-muted" />
+                                <span>{new Date(inquiry.createdAt || inquiry.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <small className="text-muted ms-4">{new Date(inquiry.createdAt || inquiry.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+                        </td>
+                        <td className="px-4 py-3 fw-medium">{inquiry.name}</td>
+                        <td className="px-4 py-3">
+                            <div>{inquiry.phone}</div>
+                            <small className="text-muted">{inquiry.email || '-'}</small>
+                        </td>
+                        <td className="px-4 py-3">
+                            <div className="text-truncate" style={{ maxWidth: '150px' }} title={inquiry.address || ''}>
+                                {inquiry.address || '-'}
+                            </div>
+                        </td>
+                        <td className="px-4 py-3">
+                            {inquiry.product ? (
+                                <Badge bg="light" text="primary" className="border border-primary-subtle fw-normal">
+                                    {inquiry.product.product_name}
+                                </Badge>
+                            ) : (
+                                <span className="text-muted fst-italic">General Inquiry</span>
+                            )}
+                        </td>
+                        <td className="px-4 py-3">
+                            {getStatusBadge(inquiry.status)}
+                        </td>
+                        <td className="px-4 py-3 text-end">
+                            <Button
+                            variant="link"
+                            className="text-primary p-1 me-2 rounded-circle hover-bg-light"
+                            onClick={() => openDetails(inquiry)}
+                            title="View Details"
+                            >
+                            <Eye size={18} />
+                            </Button>
+                            <Button
+                            variant="link"
+                            className="text-danger p-1 rounded-circle hover-bg-light"
+                            onClick={() => handleDelete(inquiry.id)}
+                            title="Delete"
+                            >
+                            <Trash2 size={18} />
+                            </Button>
+                        </td>
+                        </tr>
+                    ))
+                  ) : (
+                    <tr>
+                        <td colSpan="7" className="text-center py-5">
+                            <div className="text-muted d-flex flex-column align-items-center">
+                                <Inbox size={48} className="mb-3 opacity-25" />
+                                <p className="mb-0">No inquiries found.</p>
+                            </div>
+                        </td>
                     </tr>
-                  ))}
-                  {inquiries.length === 0 && (
-                      <tr>
-                          <td colSpan="6" className="text-center py-4 text-muted">No inquiries found.</td>
-                      </tr>
                   )}
                 </tbody>
               </Table>
@@ -203,48 +231,64 @@ const Inquiries = () => {
             </div>
         )}
 
-        <Modal show={showModal} onHide={handleCloseModal} size="lg" centered>
-          <Modal.Header closeButton>
-            <Modal.Title>Inquiry Details</Modal.Title>
+        <Modal show={showModal} onHide={handleCloseModal} size="lg" centered className="modal-with-sidebar">
+          <Modal.Header closeButton className="border-bottom-0 pb-0">
+            <Modal.Title className="fw-bold">
+                <MessageSquare size={20} className="me-2 text-primary" />
+                Inquiry Details
+            </Modal.Title>
           </Modal.Header>
-          <Modal.Body>
+          <Modal.Body className="pt-3">
             {currentInquiry && (
-                <div>
-                    <Row className="mb-3">
-                        <Col md={6}>
-                            <strong>Name:</strong> <p>{currentInquiry.name}</p>
-                        </Col>
-                        <Col md={6}>
-                            <strong>Date:</strong> <p>{new Date(currentInquiry.created_at).toLocaleString()}</p>
-                        </Col>
-                    </Row>
-                    <Row className="mb-3">
-                        <Col md={6}>
-                            <strong>Email:</strong> <p>{currentInquiry.email || 'N/A'}</p>
-                        </Col>
-                        <Col md={6}>
-                            <strong>Phone:</strong> <p>{currentInquiry.phone}</p>
+                <div className="p-2">
+                    <Row className="mb-4">
+                        <Col md={12}>
+                            <div className="d-flex justify-content-between align-items-center bg-light p-3 rounded">
+                                <div>
+                                    <h5 className="mb-1">{currentInquiry.name}</h5>
+                                    <div className="text-muted small">
+                                        Submitted on {new Date(currentInquiry.createdAt || currentInquiry.created_at).toLocaleString()}
+                                    </div>
+                                </div>
+                                {getStatusBadge(currentInquiry.status)}
+                            </div>
                         </Col>
                     </Row>
-                    <div className="mb-3">
-                        <strong>Product Interest:</strong>
-                        <p className="text-primary">{currentInquiry.product ? currentInquiry.product.product_name : 'General Inquiry'}</p>
-                    </div>
+                    
+                    <Row className="mb-4">
+                        <Col md={6}>
+                            <h6 className="text-uppercase text-muted small fw-bold mb-2">Contact Info</h6>
+                            <p className="mb-1"><strong>Phone:</strong> {currentInquiry.phone}</p>
+                            <p className="mb-1"><strong>Email:</strong> {currentInquiry.email || 'N/A'}</p>
+                            <p className="mb-0"><strong>Address:</strong> {currentInquiry.address || 'N/A'}</p>
+                        </Col>
+                        <Col md={6}>
+                            <h6 className="text-uppercase text-muted small fw-bold mb-2">Interest</h6>
+                            <p className="mb-0 text-primary fw-medium">
+                                {currentInquiry.product ? currentInquiry.product.product_name : 'General Inquiry'}
+                            </p>
+                        </Col>
+                    </Row>
+
                     <div className="mb-4">
-                        <strong>Message:</strong>
-                        <div className="p-3 bg-light rounded mt-1">
+                        <h6 className="text-uppercase text-muted small fw-bold mb-2">Message</h6>
+                        <div className="bg-light p-4 rounded border text-secondary" style={{ whiteSpace: 'pre-wrap' }}>
                             {currentInquiry.message || 'No message content.'}
                         </div>
                     </div>
                     
-                    <hr />
+                    <hr className="my-4" />
                     
-                    <div className="d-flex align-items-center gap-3">
-                        <strong>Update Status:</strong>
+                    <div className="d-flex align-items-center justify-content-between">
+                        <div className="d-flex align-items-center">
+                            <CheckCircle size={18} className="text-success me-2" />
+                            <strong className="me-3">Update Status:</strong>
+                        </div>
                         <Form.Select 
-                            style={{ width: 'auto' }}
+                            style={{ width: '200px' }}
                             value={currentInquiry.status}
                             onChange={(e) => handleStatusChange(currentInquiry.id, e.target.value)}
+                            className="form-select-sm"
                         >
                             <option value="new">New</option>
                             <option value="read">Read</option>
@@ -255,8 +299,8 @@ const Inquiries = () => {
                 </div>
             )}
           </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseModal}>
+          <Modal.Footer className="border-top-0 pt-0 pb-3 pe-4">
+            <Button variant="outline-secondary" onClick={handleCloseModal}>
               Close
             </Button>
           </Modal.Footer>

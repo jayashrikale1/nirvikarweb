@@ -8,6 +8,27 @@ const authMiddleware = require('../middlewares/authMiddleware');
  * tags:
  *   name: Auth
  *   description: Admin Authentication
+ * components:
+ *   schemas:
+ *     AdminUser:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *         name:
+ *           type: string
+ *         email:
+ *           type: string
+ *         phone:
+ *           type: string
+ *         role:
+ *           type: string
+ *           enum: [admin, manager]
+ *         status:
+ *           type: boolean
+ *         last_login:
+ *           type: string
+ *           format: date-time
  */
 
 /**

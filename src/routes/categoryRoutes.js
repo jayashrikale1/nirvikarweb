@@ -8,6 +8,21 @@ const authMiddleware = require('../middlewares/authMiddleware');
  * tags:
  *   name: Categories
  *   description: Category management APIs
+ * components:
+ *   schemas:
+ *     Category:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *         category_name:
+ *           type: string
+ *         slug:
+ *           type: string
+ *         parent_id:
+ *           type: integer
+ *         status:
+ *           type: boolean
  */
 
 /**

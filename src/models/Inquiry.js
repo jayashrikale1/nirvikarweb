@@ -19,6 +19,10 @@ const Inquiry = sequelize.define('Inquiry', {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
+  address: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
   message: {
     type: DataTypes.TEXT,
     allowNull: true,
