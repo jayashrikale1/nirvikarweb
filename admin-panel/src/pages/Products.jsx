@@ -4,7 +4,7 @@ import api from '../services/api';
 import { toast } from 'react-toastify';
 import { Plus, Edit, Trash2, X, Eye } from 'lucide-react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Container, Card, Table, Button, Modal, Form, Row, Col, Image, Pagination, Badge } from 'react-bootstrap';
+import { Container, Card, Table, Button, Modal, Form, Row, Col, Image, Pagination, Badge, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -305,28 +305,43 @@ const Products = () => {
                           {product.selling_price ? `₹${product.selling_price}` : '-'}
                       </td>
                       <td className="px-4 py-3 text-end align-middle">
-                        <Button
-                          variant="link"
-                          className="text-info p-0 me-3"
-                          onClick={() => handleView(product)}
-                          title="View Details"
-                        >
-                          <Eye size={16} />
-                        </Button>
-                        <Button
-                          variant="link"
-                          className="text-primary p-0 me-3"
-                          onClick={() => handleEdit(product)}
-                        >
-                          <Edit size={16} />
-                        </Button>
-                        <Button
-                          variant="link"
-                          className="text-danger p-0"
-                          onClick={() => handleDelete(product.id)}
-                        >
-                          <Trash2 size={16} />
-                        </Button>
+                        <div className="d-flex justify-content-end gap-2">
+                          <OverlayTrigger placement="top" overlay={<Tooltip>View Details</Tooltip>}>
+                            <Button
+                              variant="outline-info"
+                              size="sm"
+                              className="d-flex align-items-center justify-content-center"
+                              style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                              onClick={() => handleView(product)}
+                            >
+                              <Eye size={16} />
+                            </Button>
+                          </OverlayTrigger>
+
+                          <OverlayTrigger placement="top" overlay={<Tooltip>Edit Product</Tooltip>}>
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              className="d-flex align-items-center justify-content-center"
+                              style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                              onClick={() => handleEdit(product)}
+                            >
+                              <Edit size={16} />
+                            </Button>
+                          </OverlayTrigger>
+
+                          <OverlayTrigger placement="top" overlay={<Tooltip>Delete Product</Tooltip>}>
+                            <Button
+                              variant="outline-danger"
+                              size="sm"
+                              className="d-flex align-items-center justify-content-center"
+                              style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                              onClick={() => handleDelete(product.id)}
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </OverlayTrigger>
+                        </div>
                       </td>
                     </tr>
                   ))}

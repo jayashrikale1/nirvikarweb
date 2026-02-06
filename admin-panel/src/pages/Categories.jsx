@@ -3,7 +3,7 @@ import Layout from '../components/Layout';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { Container, Row, Col, Card, Table, Button, Modal, Form, Pagination } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Button, Modal, Form, Pagination, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -142,20 +142,31 @@ const Categories = () => {
                       <td className="px-4 py-3 text-muted">{(currentPage - 1) * 10 + index + 1}</td>
                       <td className="px-4 py-3 fw-medium">{category.category_name}</td>
                       <td className="px-4 py-3 text-end">
-                        <Button
-                          variant="link"
-                          className="text-primary p-0 me-3"
-                          onClick={() => handleEdit(category)}
-                        >
-                          <Edit size={16} />
-                        </Button>
-                        <Button
-                          variant="link"
-                          className="text-danger p-0"
-                          onClick={() => handleDelete(category.id)}
-                        >
-                          <Trash2 size={16} />
-                        </Button>
+                        <div className="d-flex justify-content-end gap-2">
+                          <OverlayTrigger placement="top" overlay={<Tooltip>Edit Category</Tooltip>}>
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              className="d-flex align-items-center justify-content-center"
+                              style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                              onClick={() => handleEdit(category)}
+                            >
+                              <Edit size={16} />
+                            </Button>
+                          </OverlayTrigger>
+
+                          <OverlayTrigger placement="top" overlay={<Tooltip>Delete Category</Tooltip>}>
+                            <Button
+                              variant="outline-danger"
+                              size="sm"
+                              className="d-flex align-items-center justify-content-center"
+                              style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                              onClick={() => handleDelete(category.id)}
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </OverlayTrigger>
+                        </div>
                       </td>
                     </tr>
                   ))}

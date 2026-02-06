@@ -3,7 +3,7 @@ import Layout from '../components/Layout';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 import { Eye, Trash2, Filter, Inbox, CheckCircle, Clock, MessageSquare } from 'lucide-react';
-import { Container, Card, Table, Button, Modal, Form, Badge, Pagination, Row, Col, Spinner } from 'react-bootstrap';
+import { Container, Card, Table, Button, Modal, Form, Badge, Pagination, Row, Col, Spinner, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const Inquiries = () => {
   const [inquiries, setInquiries] = useState([]);
@@ -182,26 +182,28 @@ const Inquiries = () => {
                         </td>
                         <td className="px-4 py-3">
                             <div className="d-flex align-items-center justify-content-end gap-2">
-                                <Button
-                                    variant="light"
-                                    size="sm"
-                                    className="text-primary rounded-circle d-flex align-items-center justify-content-center"
-                                    style={{ width: '32px', height: '32px' }}
-                                    onClick={() => openDetails(inquiry)}
-                                    title="View Details"
-                                >
-                                    <Eye size={16} />
-                                </Button>
-                                <Button
-                                    variant="light"
-                                    size="sm"
-                                    className="text-danger rounded-circle d-flex align-items-center justify-content-center"
-                                    style={{ width: '32px', height: '32px' }}
-                                    onClick={() => handleDelete(inquiry.id)}
-                                    title="Delete"
-                                >
-                                    <Trash2 size={16} />
-                                </Button>
+                                <OverlayTrigger placement="top" overlay={<Tooltip>View Details</Tooltip>}>
+                                    <Button
+                                        variant="outline-primary"
+                                        size="sm"
+                                        className="d-flex align-items-center justify-content-center"
+                                        style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                                        onClick={() => openDetails(inquiry)}
+                                    >
+                                        <Eye size={16} />
+                                    </Button>
+                                </OverlayTrigger>
+                                <OverlayTrigger placement="top" overlay={<Tooltip>Delete Inquiry</Tooltip>}>
+                                    <Button
+                                        variant="outline-danger"
+                                        size="sm"
+                                        className="d-flex align-items-center justify-content-center"
+                                        style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                                        onClick={() => handleDelete(inquiry.id)}
+                                    >
+                                        <Trash2 size={16} />
+                                    </Button>
+                                </OverlayTrigger>
                             </div>
                         </td>
                         </tr>
