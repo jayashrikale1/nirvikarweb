@@ -27,6 +27,10 @@ const Product = sequelize.define('Product', {
     type: DataTypes.STRING(100),
     allowNull: true,
   },
+  about_product: {
+    type: DataTypes.TEXT('long'),
+    allowNull: true,
+  },
   short_description: {
     type: DataTypes.TEXT,
     allowNull: true,
@@ -41,6 +45,34 @@ const Product = sequelize.define('Product', {
   },
   material: {
     type: DataTypes.STRING(200),
+    allowNull: true,
+  },
+  material_type: {
+    type: DataTypes.STRING(200),
+    allowNull: true,
+  },
+  all_materials: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  width: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+  },
+  length: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+  },
+  height: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+  },
+  weight: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+  },
+  thali: {
+    type: DataTypes.STRING(100),
     allowNull: true,
   },
   country_of_origin: {

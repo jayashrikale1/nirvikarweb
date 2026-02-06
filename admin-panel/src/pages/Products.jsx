@@ -101,8 +101,16 @@ const Products = () => {
       brand: product.brand,
       short_description: product.short_description,
       full_description: product.full_description,
+      about_product: product.about_product,
       uses: product.uses,
       material: product.material,
+      material_type: product.material_type,
+      all_materials: product.all_materials,
+      width: product.width,
+      length: product.length,
+      height: product.height,
+      weight: product.weight,
+      thali: product.thali,
       country_of_origin: product.country_of_origin,
       mrp_price: product.mrp_price,
       selling_price: product.selling_price,
@@ -127,8 +135,16 @@ const Products = () => {
     formData.append('brand', data.brand || '');
     formData.append('short_description', data.short_description || '');
     formData.append('full_description', data.full_description || '');
+    formData.append('about_product', data.about_product || '');
     formData.append('uses', data.uses || '');
     formData.append('material', data.material || '');
+    formData.append('material_type', data.material_type || '');
+    formData.append('all_materials', data.all_materials || '');
+    formData.append('width', data.width || '');
+    formData.append('length', data.length || '');
+    formData.append('height', data.height || '');
+    formData.append('weight', data.weight || '');
+    formData.append('thali', data.thali || '');
     formData.append('country_of_origin', data.country_of_origin || '');
     formData.append('mrp_price', data.mrp_price || 0);
     formData.append('selling_price', data.selling_price || 0);
@@ -184,7 +200,15 @@ const Products = () => {
       specifications: [{ key: '', value: '' }],
       gst_applicable: false,
       home_delivery: true,
-      status: true
+      status: true,
+      about_product: '',
+      material_type: '',
+      all_materials: '',
+      width: '',
+      length: '',
+      height: '',
+      weight: '',
+      thali: ''
     });
     setIsEditing(false);
     setCurrentProduct(null);
@@ -203,7 +227,15 @@ const Products = () => {
                   specifications: [{ key: '', value: '' }],
                   gst_applicable: false,
                   home_delivery: true,
-                  status: true
+                  status: true,
+                  about_product: '',
+                  material_type: '',
+                  all_materials: '',
+                  width: '',
+                  length: '',
+                  height: '',
+                  weight: '',
+                  thali: ''
                 });
                 setShowModal(true);
             }}
@@ -243,6 +275,8 @@ const Products = () => {
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">Category</th>
                     <th className="px-4 py-3">Brand</th>
+                    <th className="px-4 py-3">Material Type</th>
+                    <th className="px-4 py-3">MRP</th>
                     <th className="px-4 py-3">Price</th>
                     <th className="px-4 py-3 text-end">Actions</th>
                   </tr>
@@ -263,6 +297,10 @@ const Products = () => {
                           {categories.find(c => c.id === product.category_id)?.category_name || '-'}
                       </td>
                       <td className="px-4 py-3 text-muted align-middle">{product.brand || '-'}</td>
+                      <td className="px-4 py-3 text-muted align-middle">{product.material_type || '-'}</td>
+                      <td className="px-4 py-3 text-muted align-middle">
+                          {product.mrp_price ? `₹${product.mrp_price}` : '-'}
+                      </td>
                       <td className="px-4 py-3 text-muted align-middle">
                           {product.selling_price ? `₹${product.selling_price}` : '-'}
                       </td>
@@ -354,28 +392,72 @@ const Products = () => {
               </Row>
 
               <Row>
-                <Col md={6}>
+                <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Brand</Form.Label>
                     <Form.Control {...register('brand')} />
                   </Form.Group>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
                     <Form.Group className="mb-3">
                         <Form.Label>Material</Form.Label>
                         <Form.Control {...register('material')} />
                     </Form.Group>
                 </Col>
+                <Col md={4}>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Material Type</Form.Label>
+                        <Form.Control {...register('material_type')} />
+                    </Form.Group>
+                </Col>
+              </Row>
+
+              <Form.Group className="mb-3">
+                  <Form.Label>All Materials</Form.Label>
+                  <Form.Control as="textarea" rows={2} {...register('all_materials')} />
+              </Form.Group>
+
+              <Row>
+                  <Col md={3}>
+                      <Form.Group className="mb-3">
+                          <Form.Label>Width</Form.Label>
+                          <Form.Control {...register('width')} />
+                      </Form.Group>
+                  </Col>
+                  <Col md={3}>
+                      <Form.Group className="mb-3">
+                          <Form.Label>Length</Form.Label>
+                          <Form.Control {...register('length')} />
+                      </Form.Group>
+                  </Col>
+                  <Col md={3}>
+                      <Form.Group className="mb-3">
+                          <Form.Label>Height</Form.Label>
+                          <Form.Control {...register('height')} />
+                      </Form.Group>
+                  </Col>
+                   <Col md={3}>
+                      <Form.Group className="mb-3">
+                          <Form.Label>Weight</Form.Label>
+                          <Form.Control {...register('weight')} />
+                      </Form.Group>
+                  </Col>
               </Row>
 
               <Row>
-                  <Col md={6}>
+                  <Col md={4}>
                       <Form.Group className="mb-3">
                           <Form.Label>Country of Origin</Form.Label>
                           <Form.Control {...register('country_of_origin')} />
                       </Form.Group>
                   </Col>
-                  <Col md={6}>
+                  <Col md={4}>
+                      <Form.Group className="mb-3">
+                          <Form.Label>Thali</Form.Label>
+                          <Form.Control {...register('thali')} />
+                      </Form.Group>
+                  </Col>
+                  <Col md={4}>
                       <Form.Group className="mb-3">
                           <Form.Label>MRP Price</Form.Label>
                           <Form.Control type="number" step="0.01" {...register('mrp_price')} />
@@ -397,6 +479,11 @@ const Products = () => {
                       </Form.Group>
                   </Col>
               </Row>
+
+              <Form.Group className="mb-3">
+                <Form.Label>About Product</Form.Label>
+                <Form.Control as="textarea" rows={2} {...register('about_product')} />
+              </Form.Group>
 
               <Form.Group className="mb-3">
                 <Form.Label>Short Description</Form.Label>
@@ -561,8 +648,30 @@ const Products = () => {
                                         <span>{viewProductData.material || '-'}</span>
                                     </Col>
                                     <Col xs={6} md={4}>
+                                        <small className="text-muted d-block">Material Type</small>
+                                        <span>{viewProductData.material_type || '-'}</span>
+                                    </Col>
+                                    <Col xs={6} md={4}>
                                         <small className="text-muted d-block">Country of Origin</small>
                                         <span>{viewProductData.country_of_origin || '-'}</span>
+                                    </Col>
+                                    <Col xs={6} md={4}>
+                                        <small className="text-muted d-block">Thali</small>
+                                        <span>{viewProductData.thali || '-'}</span>
+                                    </Col>
+                                    <Col xs={6} md={4}>
+                                        <small className="text-muted d-block">Dimensions (L x W x H)</small>
+                                        <span>
+                                            {[viewProductData.length, viewProductData.width, viewProductData.height].filter(Boolean).join(' x ') || '-'}
+                                        </span>
+                                    </Col>
+                                     <Col xs={6} md={4}>
+                                        <small className="text-muted d-block">Weight</small>
+                                        <span>{viewProductData.weight || '-'}</span>
+                                    </Col>
+                                     <Col xs={12}>
+                                        <small className="text-muted d-block">All Materials</small>
+                                        <span>{viewProductData.all_materials || '-'}</span>
                                     </Col>
                                     <Col xs={6} md={4}>
                                         <small className="text-muted d-block">Created At</small>
@@ -597,6 +706,13 @@ const Products = () => {
                             <Col md={12} className="mb-4">
                                 <h6 className="fw-bold text-primary border-bottom pb-2 mb-3">Description & Uses</h6>
                                 
+                                {viewProductData.about_product && (
+                                    <div className="mb-3">
+                                        <strong className="d-block text-dark mb-1">About Product</strong>
+                                        <p className="text-muted">{viewProductData.about_product}</p>
+                                    </div>
+                                )}
+
                                 <div className="mb-3">
                                     <strong className="d-block text-dark mb-1">Short Description</strong>
                                     <p className="text-muted">{viewProductData.short_description || 'No short description.'}</p>
