@@ -22,6 +22,16 @@ exports.createInquiry = async (req, res) => {
       return res.status(400).json({ message: 'Name and phone are required' });
     }
 
+    // Validate product_id if provided
+    let productName = 'General Inquiry';
+    if (product_id) {
+        const product = await Product.findByPk(product_id);
+        if (!product) {
+            return res.status(400).json({ message: `Product with ID ${product_id} not found` });
+        }
+        productName = product.product_name;
+    }
+
     const newInquiry = await Inquiry.create({
       name,
       email,
@@ -30,15 +40,6 @@ exports.createInquiry = async (req, res) => {
       message,
       product_id: product_id || null
     });
-
-    // Fetch product details if product_id exists
-    let productName = 'General Inquiry';
-    if (product_id) {
-        const product = await Product.findByPk(product_id);
-        if (product) {
-            productName = product.product_name;
-        }
-    }
 
     // Send Email Notification to Admin
     const mailOptions = {
