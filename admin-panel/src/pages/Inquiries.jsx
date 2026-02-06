@@ -129,12 +129,12 @@ const Inquiries = () => {
               <Table responsive hover className="mb-0 align-middle">
                 <thead className="bg-light">
                   <tr>
-                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold" style={{ width: '50px' }}>Sr No.</th>
-                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Date</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold d-none d-md-table-cell" style={{ width: '50px' }}>Sr No.</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold d-none d-lg-table-cell">Date</th>
                     <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Customer</th>
-                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Contact</th>
-                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Address</th>
-                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Interest</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold d-none d-lg-table-cell">Contact</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold d-none d-xl-table-cell">Address</th>
+                    <th className="px-4 py-3 text-uppercase text-muted small fw-bold d-none d-md-table-cell">Interest</th>
                     <th className="px-4 py-3 text-uppercase text-muted small fw-bold">Status</th>
                     <th className="px-4 py-3 text-end text-uppercase text-muted small fw-bold">Actions</th>
                   </tr>
@@ -143,25 +143,32 @@ const Inquiries = () => {
                   {inquiries.length > 0 ? (
                     inquiries.map((inquiry, index) => (
                         <tr key={inquiry.id} className={inquiry.status === 'new' ? 'bg-light-primary' : ''}>
-                        <td className="px-4 py-3 text-muted">{(currentPage - 1) * 10 + index + 1}</td>
-                        <td className="px-4 py-3 text-nowrap">
+                        <td className="px-4 py-3 text-muted d-none d-md-table-cell">{(currentPage - 1) * 10 + index + 1}</td>
+                        <td className="px-4 py-3 text-nowrap d-none d-lg-table-cell">
                             <div className="d-flex align-items-center">
                                 <Clock size={14} className="me-2 text-muted" />
                                 <span>{new Date(inquiry.createdAt || inquiry.created_at).toLocaleDateString()}</span>
                             </div>
                             <small className="text-muted ms-4">{new Date(inquiry.createdAt || inquiry.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
                         </td>
-                        <td className="px-4 py-3 fw-medium">{inquiry.name}</td>
                         <td className="px-4 py-3">
+                            <div className="fw-medium">{inquiry.name}</div>
+                            {/* Show details on mobile that are hidden in other columns */}
+                            <div className="d-lg-none text-muted small mt-1">
+                                <div>{inquiry.phone}</div>
+                                <div className="text-truncate" style={{ maxWidth: '150px' }}>{new Date(inquiry.createdAt || inquiry.created_at).toLocaleDateString()}</div>
+                            </div>
+                        </td>
+                        <td className="px-4 py-3 d-none d-lg-table-cell">
                             <div>{inquiry.phone}</div>
                             <small className="text-muted">{inquiry.email || '-'}</small>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 d-none d-xl-table-cell">
                             <div className="text-truncate" style={{ maxWidth: '150px' }} title={inquiry.address || ''}>
                                 {inquiry.address || '-'}
                             </div>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 d-none d-md-table-cell">
                             {inquiry.product ? (
                                 <Badge bg="light" text="primary" className="border border-primary-subtle fw-normal">
                                     {inquiry.product.product_name}

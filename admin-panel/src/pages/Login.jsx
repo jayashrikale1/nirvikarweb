@@ -3,12 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Container, Card, Form, Button, InputGroup, Spinner } from 'react-bootstrap';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import logo from '../assets/logo.png';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -28,9 +29,9 @@ const Login = () => {
   };
 
   return (
-    <div className="login-page d-flex align-items-center justify-content-center min-vh-100 position-relative">
+    <div className="login-page vh-100 overflow-y-auto position-relative">
       {/* Background with overlay */}
-      <div className="position-absolute top-0 start-0 w-100 h-100" 
+      <div className="position-fixed top-0 start-0 w-100 h-100" 
            style={{ 
              background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
              zIndex: -1 
@@ -42,7 +43,7 @@ const Login = () => {
         </div>
       </div>
 
-      <Container>
+      <Container className="min-vh-100 d-flex flex-column justify-content-center py-4">
         <div className="row justify-content-center">
           <div className="col-md-5 col-lg-4">
             <Card className="border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden', backdropFilter: 'blur(10px)', backgroundColor: 'rgba(255, 255, 255, 0.95)' }}>
@@ -84,14 +85,21 @@ const Login = () => {
                         <Lock size={18} />
                       </InputGroup.Text>
                       <Form.Control
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="border-start-0 ps-0 shadow-none"
+                        className="border-start-0 border-end-0 ps-0 shadow-none"
                         style={{ height: '45px' }}
                       />
+                      <InputGroup.Text 
+                        className="bg-white border-start-0 text-muted" 
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </InputGroup.Text>
                     </InputGroup>
                   </Form.Group>
 
@@ -105,9 +113,9 @@ const Login = () => {
                     {loading ? <Spinner animation="border" size="sm" /> : <>Sign In <ArrowRight size={18} /></>}
                   </Button>
                   
-                  {/* <div className="text-center">
+                  <div className="text-center">
                     <p className="text-muted small mb-0">Don't have an account? <Link to="/register" className="fw-semibold text-decoration-none">Create account</Link></p>
-                  </div> */}
+                  </div>
                 </Form>
               </Card.Body>
               <div className="card-footer bg-light border-0 text-center py-3">
