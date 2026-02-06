@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
 import { Container, Row, Col, Card, Spinner } from 'react-bootstrap';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalCategories: 0,
-    totalInquiries: 0
+    totalInquiries: 0,
+    recentActivity: []
   });
   const [loading, setLoading] = useState(true);
 
@@ -42,7 +45,11 @@ const Dashboard = () => {
         <h2 className="mb-4">Dashboard</h2>
         <Row className="g-4">
           <Col md={4}>
-            <Card className="shadow-sm h-100">
+            <Card 
+              className="shadow-sm h-100" 
+              onClick={() => navigate('/products')} 
+              style={{ cursor: 'pointer' }}
+            >
               <Card.Body>
                 <Card.Subtitle className="mb-2 text-muted">Total Products</Card.Subtitle>
                 <Card.Title className="display-6 fw-bold">{stats.totalProducts}</Card.Title>
@@ -50,7 +57,11 @@ const Dashboard = () => {
             </Card>
           </Col>
           <Col md={4}>
-            <Card className="shadow-sm h-100">
+            <Card 
+              className="shadow-sm h-100"
+              onClick={() => navigate('/categories')} 
+              style={{ cursor: 'pointer' }}
+            >
               <Card.Body>
                 <Card.Subtitle className="mb-2 text-muted">Total Categories</Card.Subtitle>
                 <Card.Title className="display-6 fw-bold">{stats.totalCategories}</Card.Title>
@@ -58,7 +69,11 @@ const Dashboard = () => {
             </Card>
           </Col>
           <Col md={4}>
-            <Card className="shadow-sm h-100">
+            <Card 
+              className="shadow-sm h-100"
+              onClick={() => navigate('/inquiries')} 
+              style={{ cursor: 'pointer' }}
+            >
               <Card.Body>
                 <Card.Subtitle className="mb-2 text-muted">Total Inquiries</Card.Subtitle>
                 <Card.Title className="display-6 fw-bold">{stats.totalInquiries}</Card.Title>
@@ -70,9 +85,27 @@ const Dashboard = () => {
 
         <div className="mt-5">
           <h3 className="mb-4">Recent Activity</h3>
-          <Card className="shadow-sm text-center p-5 text-muted">
-             <Card.Body>
-               No recent activity found.
+          <Card className="shadow-sm">
+             <Card.Body className="p-0">
+               {stats.recentActivity && stats.recentActivity.length > 0 ? (
+                 <div className="list-group list-group-flush">
+                   {stats.recentActivity.map((activity) => (
+                     <div key={activity.id} className="list-group-item p-3 d-flex justify-content-between align-items-center">
+                       <div>
+                         <span className={`badge me-2 ${activity.type === 'product' ? 'bg-success' : 'bg-primary'}`}>
+                           {activity.type === 'product' ? 'Product' : 'Inquiry'}
+                         </span>
+                         {activity.message}
+                       </div>
+                       <small className="text-muted">
+                         {new Date(activity.date).toLocaleDateString()} {new Date(activity.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                       </small>
+                     </div>
+                   ))}
+                 </div>
+               ) : (
+                 <div className="p-5 text-center text-muted">No recent activity found.</div>
+               )}
              </Card.Body>
           </Card>
         </div>
