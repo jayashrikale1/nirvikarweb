@@ -3,12 +3,15 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { Container, Card, Form, Button, Row, Col, InputGroup } from 'react-bootstrap';
 import Layout from '../components/Layout';
-import { Lock, KeyRound, Save } from 'lucide-react';
+import { Lock, KeyRound, Save, Eye, EyeOff } from 'lucide-react';
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { changePassword } = useAuth();
 
@@ -56,13 +59,20 @@ const ChangePassword = () => {
                         <Lock size={18} className="text-muted" />
                       </InputGroup.Text>
                       <Form.Control
-                        type="password"
+                        type={showCurrentPassword ? "text" : "password"}
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="border-start-0 ps-0"
+                        className="border-start-0 border-end-0 ps-0"
                         placeholder="Enter current password"
                         required
                       />
+                      <InputGroup.Text 
+                        className="bg-white border-start-0" 
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      >
+                        {showCurrentPassword ? <EyeOff size={18} className="text-muted"/> : <Eye size={18} className="text-muted"/>}
+                      </InputGroup.Text>
                     </InputGroup>
                   </Form.Group>
 
@@ -73,14 +83,21 @@ const ChangePassword = () => {
                         <KeyRound size={18} className="text-muted" />
                       </InputGroup.Text>
                       <Form.Control
-                        type="password"
+                        type={showNewPassword ? "text" : "password"}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="border-start-0 ps-0"
+                        className="border-start-0 border-end-0 ps-0"
                         placeholder="Enter new password"
                         required
                         minLength={6}
                       />
+                      <InputGroup.Text 
+                        className="bg-white border-start-0" 
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                      >
+                        {showNewPassword ? <EyeOff size={18} className="text-muted"/> : <Eye size={18} className="text-muted"/>}
+                      </InputGroup.Text>
                     </InputGroup>
                   </Form.Group>
 
@@ -91,14 +108,21 @@ const ChangePassword = () => {
                         <KeyRound size={18} className="text-muted" />
                       </InputGroup.Text>
                       <Form.Control
-                        type="password"
+                        type={showConfirmPassword ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="border-start-0 ps-0"
+                        className="border-start-0 border-end-0 ps-0"
                         placeholder="Confirm new password"
                         required
                         minLength={6}
                       />
+                      <InputGroup.Text 
+                        className="bg-white border-start-0" 
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? <EyeOff size={18} className="text-muted"/> : <Eye size={18} className="text-muted"/>}
+                      </InputGroup.Text>
                     </InputGroup>
                   </Form.Group>
 
